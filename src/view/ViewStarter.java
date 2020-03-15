@@ -20,7 +20,7 @@ public class ViewStarter extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-
+            //nisim
         try {
             Parent root = FXMLLoader.load(getClass().getResource("./layouts/pick_html_element.fxml"));
             Scene scene = new Scene(root);
