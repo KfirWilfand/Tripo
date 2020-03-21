@@ -1,5 +1,6 @@
 package view;
 
+import controller.MongoDbController;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -22,10 +23,11 @@ public class ViewStarter extends Application {
     public void start(Stage primaryStage) {
 
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("./layouts/pick_html_element.fxml"));
+            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("./layouts/pick_html_element.fxml"));
             Scene scene = new Scene(root);
             primaryStage.setScene(scene);
             primaryStage.show();
+//            new MongoDbController().connect();
         } catch (IOException e) {
             e.printStackTrace();
         }
