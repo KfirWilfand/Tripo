@@ -5,6 +5,9 @@ import controller.utils.TextType;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import static net.sf.javaml.utils.MathUtils.eq;
 
 public class MongoDbController {
     // static variable single_instance of type Singleton
@@ -43,12 +46,15 @@ public class MongoDbController {
 
     private List<String> getTexts(TextType type) {
         DBCollection collection = database.getCollection("texts");
-        List<String> tempTextsList = new ArrayList<>();
+        List<String> tempTextsList = new ArrayList<String>();
+        tempTextsList.clear();
 
 
         DBCursor texts;
         if (type != null) {
-            texts = collection.find((DBObject) new BasicDBObject().put("type", type));
+            BasicDBObject searchQuery = new BasicDBObject();
+            searchQuery.put("type", type.toString());
+            texts = collection.find(searchQuery);
         } else {
             texts = collection.find();
         }
