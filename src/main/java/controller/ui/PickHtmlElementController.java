@@ -1,22 +1,26 @@
 package controller.ui;
 
-import javafx.concurrent.Worker;
+import controller.utils.Helper;
+import controller.utils.Logger;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+import model.Text;
 import netscape.javascript.JSObject;
-import org.w3c.dom.*;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.StringWriter;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class PickHtmlElementController {
+    @FXML
+    private Pane mainPane;
 
     @FXML
     private WebView wvMain;
@@ -27,118 +31,107 @@ public class PickHtmlElementController {
     @FXML
     private Button btnLoad;
 
-    /** for communication to the Javascript engine. */
+    /**
+     * for communication to the Javascript engine.
+     */
     JSObject javascriptConnector;
 
-    /** for communication from the Javascript engine. */
+    /**
+     * for communication from the Javascript engine.
+     */
     JavaConnector javaConnector = new JavaConnector();
 
     public void initialize() {
-//        txfUrlAdress.textProperty().addListener((observable, oldValue, newValue) -> {
-//            System.out.println("textfield changed from " + oldValue + " to " + newValue);
-//        });
+
     }
 
     @FXML
     void onLoadBtnClick(ActionEvent event) {
-        String urlAddresss = txfUrlAdress.getText();
-        WebEngine webEngine = wvMain.getEngine();
-        webEngine.setJavaScriptEnabled(true);
-        webEngine.getLoadWorker().stateProperty()
-                .addListener((obs, oldValue, newValue) -> {
-//                    if (newValue == Worker.State.RUNNING) {
-
-//                    }
-
-                    System.out.println(newValue);
-                    if (newValue == Worker.State.SUCCEEDED) {
-                        System.out.println("finished loading");
-//                        webEngine.executeScript(
-//                                "document.getElementById('INDWrap').appendChild(document.createTextNode('World!'));"
-//                        );
-                        webEngine.executeScript("Object.keys(window).forEach(key => {\n" +
-                                "let div = document.createElement('div');\n" +
-                                "\n" +
-                                "                                    if (/^onmouseover/.test(key)) {\n" +
-                                "                                       window.addEventListener(key.slice(2), event => {\n" +
-                                "                                        console.log(event.fromElement);\n" +
-                                "                                        div.className = 'anotherClass';\n" +
-                                "                                       div.style.position = 'absolute';\n" +
-                                "                                        div.style.content = '';\n" +
-                                "                                        div.style.height = `${event.fromElement.offsetHeight +'px'}`;\n" +
-                                "                                        div.style.width = `${event.fromElement.offsetWidth +'px'}`;\n" +
-                                "                                        div.style.top = `${event.fromElement.offsetTop + 'px'}`;\n" +
-                                "//                                \"        div.style.right = `${100+ 'px'}`;\\n\" +\n" +
-                                "//                                \"        div.style.bottom = `${100 + 'px'}`;\\n\" +\n" +
-                                "                                        div.style.left = `${event.fromElement.offsetLeft + 'px'}`;\n" +
-                                "                                       div.style.background = '#05f';\n" +
-                                "                                        div.style.opacity = '0.25';\n" +
-                                "\n" +
-                                "                                        event.fromElement.appendChild(div);\n" +
-                                "                                        });\n" +
-                                "                                    if (/^onmouseout/.test(key)) {\n" +
-                                "                                        window.addEventListener(key.slice(2), event => {\n" +
-                                "                                        div.onmouseout='{div.style.display === \\\"none\\\"}';\n" +
-                                "                                        });\n" +
-                                "                                    }\n" +
-                                "                                    }\n" +
-                                "                                });\n" +
-                                "\n" +
-                                "                            ");
-
-//                        try {
-//                            TransformerFactory transformerFactory = TransformerFactory
-//                                    .newInstance();
-//                            Transformer transformer = transformerFactory.newTransformer();
-//                            StringWriter stringWriter = new StringWriter();
-//                            transformer.transform(new DOMSource(webEngine.getDocument()),
-//                                    new StreamResult(stringWriter));
-//                            String xml = stringWriter.getBuffer().toString();
-//
-//                            System.out.println(xml);
-//
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-
-                    }
-                }); // addListener()
+        Platform.runLater(new Runnable() {
 
 
+            @Override
+            public void run() {
+                String urlAddresss = txfUrlAdress.getText();
+                WebEngine webEngine = wvMain.getEngine();
+                webEngine.setJavaScriptEnabled(true);
 
-        webEngine.load(urlAddresss);
+                injectJsCode(webEngine);
+                Logger.info("JS Code have been inject!");
 
-//        webEngine.reload();
-        // set up the listener
-//        webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
-//            if (Worker.State.SUCCEEDED == newValue) {
-//                // set an interface object named 'javaConnector' in the web engine's page
-//                JSObject window = (JSObject) webEngine.executeScript("window");
-//                window.setMember("javaConnector", javaConnector);
-//
-//                // get the Javascript connector object.
-//                javascriptConnector = (JSObject) webEngine.executeScript("getJsConnector()");
-//            }
-//        });
+                webEngine.getLoadWorker().stateProperty()
+                        .addListener((obs, oldValue, newValue) -> {
+                            Logger.info("WebEngine status is " + newValue);
 
-//        System.out.println(javascriptConnector);
+                        });
+
+                webEngine.load(urlAddresss);
+            }
+
+            private void injectJsCode(WebEngine webEngine) {
+                JSObject window = (JSObject) webEngine.executeScript("window");
+                window.setMember("javaConnector", javaConnector);
+
+                String webJsInjection = Helper.getInstance().fileToString(getClass().getClassLoader().getResource("js/webJsInjection.js"));
+                webEngine.executeScript(webJsInjection);
+
+                // get the Javascript connector object.
+                javascriptConnector = (JSObject) webEngine.executeScript("getJsConnector()");
+            }
+        });
     }
 
     public class JavaConnector {
+        public JavaConnector() {
+
+        }
+
         /**
          * called when the JS side wants a String to be converted.
          *
-         * @param value
-         *         the String to convert
+         * @param htmlRowDataElement the String to convert
          */
-        public void toLowerCase(String value) {
-            if (null != value) {
-                javascriptConnector.call("showResult", value.toLowerCase());
-                System.out.println(value);
+        public void captureHtml(String htmlRowDataElement) {
+
+            if (null != htmlRowDataElement) {
+                getTextObj(htmlRowDataElement);
+
+                javascriptConnector.call("showResult", htmlRowDataElement);
+
             }
         }
     }
 
+    private void getTextObj(String htmlRowDataElement) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                JSONParser jsonParser = new JSONParser();
 
+                try {
+                    JSONObject capture = (JSONObject) jsonParser.parse(htmlRowDataElement);
+
+                    JSONArray attributesList = (JSONArray) capture.get("attributes");
+                    String values = "";
+
+                    for (Object attribute : attributesList) {
+                        values += (((JSONObject) attribute).values() + " ");
+                    }
+
+                    values = values.replace("[", "").replace("]", "");
+
+                    FXMLLoader fxmlLoader = Helper.getInstance().layoutSwitcher(mainPane, "html_element_confirmation.fxml");
+
+                    if (fxmlLoader != null) {
+                        ((ElementConfitmationController) fxmlLoader.getController()).updateUi(new Text(txfUrlAdress.getText(), capture.get("content").toString(), values));
+                    }
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
 }
 

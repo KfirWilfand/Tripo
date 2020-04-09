@@ -16,15 +16,13 @@ repositories {
 }
 
 dependencies {
-//    testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'org.mongodb:mongo-java-driver:2.12.3'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
     compile group: 'net.sourceforge', name: 'javaml', version: '0.1.5'
     compile "edu.stanford.nlp:stanford-corenlp:3.9.2"
     compile "edu.stanford.nlp:stanford-corenlp:3.9.2:models"
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.25'
-
-
-
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
+    compile 'com.opencsv:opencsv:5.1'
+    compile 'org.jsoup:jsoup:1.13.1'
+    compile group: 'org.riversun', name: 'java-promise', version: '1.1.0'
 }

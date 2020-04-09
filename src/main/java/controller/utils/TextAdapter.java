@@ -1,5 +1,6 @@
 package controller.utils;
 
+import model.Text;
 import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 
@@ -21,38 +22,38 @@ public class TextAdapter {
 
     }
 
-    public List<Double> getVectorByWord(List<Map<String, Double>> data, String word) {
+    public List<Double> getVectorByWord(Map<String , Map<String, Double>> data, String word) {
         List<Double> wordVec = new ArrayList<Double>();
 
-        for (Map<String, Double> textMap : data) {
+        for (Map<String, Double> textMap : data.values()) {
             wordVec.add(textMap.get(word));
         }
 
         return wordVec;
     }
 
-    public List<Map<String, Double>> getOccur(List<String> texts, Set<String> words) {
-        List<Map<String, Double>> occurList = new ArrayList<>();
+    public Map<String ,Map<String, Double>> getOccur(List<Text> texts, Set<String> words) {
+        Map<String ,Map<String, Double>> occurList = new HashMap<>();
 
-        for (String text : texts) {
+        for (Text text : texts) {
             Map<String, Double> wordOccurText = new HashMap<>();
 
             for (String word : words) {
-                double count = StringUtils.countMatches(text.toLowerCase(), word);
+                double count = StringUtils.countMatches(text.getContent().toLowerCase(), word);
                 wordOccurText.put(word, count);
             }
 
-            occurList.add(wordOccurText);
+            occurList.put(text.getId(),wordOccurText);
         }
 
         return occurList;
     }
 
-    public Set<String> getAllWordsFromTexts(List<String> texts) {
+    public Set<String> getAllWordsFromTexts(List<Text> texts) {
         Set<String> words = new HashSet();
 
-        for (String text : texts) {
-            words.addAll(textToWord(text));
+        for (Text text : texts) {
+            words.addAll(textToWord(text.getContent()));
         }
 
         return words;

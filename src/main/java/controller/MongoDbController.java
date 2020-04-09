@@ -1,7 +1,12 @@
 package controller;
 
 import com.mongodb.*;
+import com.mongodb.util.JSON;
+import controller.utils.Logger;
 import controller.utils.TextType;
+import jdk.nashorn.internal.runtime.Debug;
+import model.Text;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,17 +41,17 @@ public class MongoDbController {
         }
     }
 
-    public List<String> getTextsByType(TextType type) {
+    public List<Text> getTextsByType(TextType type) {
         return this.getTexts(type);
     }
 
-    public List<String> getTextsAll() {
+    public List<Text> getTextsAll() {
         return this.getTexts(null);
     }
 
-    private List<String> getTexts(TextType type) {
+    private List<Text> getTexts(TextType type) {
         DBCollection collection = database.getCollection("texts");
-        List<String> tempTextsList = new ArrayList<String>();
+        List<Text> tempTextsList = new ArrayList<Text>();
         tempTextsList.clear();
 
 
@@ -60,7 +65,16 @@ public class MongoDbController {
         }
 
         while (texts.hasNext()) {
-            tempTextsList.add((String) texts.next().get("content"));
+            DBObject item = texts.next();
+
+            Text text = new Text(
+                    item.get("id").toString(),
+                    (String) item.get("link"),
+                    (String) item.get("content"),
+                    (String) item.get("attributes"),
+                    TextType.valueOf(((String) item.get("type"))));
+
+            tempTextsList.add(text);
         }
 
         return tempTextsList;
@@ -79,4 +93,11 @@ public class MongoDbController {
         return stopWordsList;
     }
 
+    public void addText(Text text) {
+        Logger.debug(text.toString());
+
+        DBCollection collection = database.getCollection("texts");
+        DBObject dbObject = (DBObject) JSON.parse(text.getJsonFormat());
+        collection.insert(dbObject);
+    }
 }

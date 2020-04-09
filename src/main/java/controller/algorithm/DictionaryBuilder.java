@@ -1,43 +1,41 @@
 package controller.algorithm;
 
 import controller.MongoDbController;
+import controller.Settings;
 import controller.utils.TextAdapter;
 import controller.utils.TextType;
+import model.Text;
+import model.Dictionary;
 import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
 import net.sf.javaml.distance.DistanceMeasure;
 import net.sf.javaml.distance.EuclideanDistance;
-import net.sf.javaml.distance.SpearmanFootruleDistance;
 import net.sf.javaml.distance.SpearmanRankCorrelation;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+
+
+import java.util.*;
 
 public class DictionaryBuilder {
-    private static final double IRRELEVANT_WORD_THRESHOLD = 0.0001;
-    private static final int K_VALUE_KNN = 3;
-
     MongoDbController db;
     TextAdapter textAdapter;
-    Dataset dictionary;
 
     public DictionaryBuilder() {
         db = MongoDbController.getInstance();
         textAdapter = TextAdapter.getInstance();
-        dictionary = new DefaultDataset();
     }
 
-    public void create() {
+    public Dictionary create() {
         Set<String> unFilteredWordList = textAdapter.getAllWordsFromTexts(db.getTextsAll());
-        unFilteredWordList.removeAll(db.getStopWords());
+//        unFilteredWordList.removeAll(db.getStopWords());
 
-        List<String> perExTexts = db.getTextsByType(TextType.PerEx);
-        List<String> promoTexts = db.getTextsByType(TextType.Promo);
+        List<Text> perExTexts = db.getTextsByType(TextType.PerEx);
+        List<Text> promoTexts = db.getTextsByType(TextType.Promo);
 
-        List<Map<String, Double>> perExOccur = textAdapter.getOccur(perExTexts, unFilteredWordList);
-        List<Map<String, Double>> promoOccur = textAdapter.getOccur(promoTexts, unFilteredWordList);
+        Map<String, Map<String, Double>> perExOccur = textAdapter.getOccur(perExTexts, unFilteredWordList);
+        Map<String, Map<String, Double>> promoOccur = textAdapter.getOccur(promoTexts, unFilteredWordList);
 
         /*
          * The simplest incarnation of the DenseInstance constructor will only
@@ -45,42 +43,34 @@ public class DictionaryBuilder {
          * values as attributes and no class value set. For unsupervised machine
          * learning techniques this is probably the most convenient constructor.
          */
-
         SpearmanRankCorrelation spearmanRankCorr = new SpearmanRankCorrelation();
 
-
+        Map<String, Double> destMap = new HashMap<>();
         for (String word : unFilteredWordList) {
 
             List<Double> perExVecWord = textAdapter.getVectorByWord(perExOccur, word);
             Instance perExInstance = new DenseInstance(perExVecWord.stream().mapToDouble(d -> d).toArray(), TextType.PerEx.toString());
 
-
             List<Double> promoVecWord = textAdapter.getVectorByWord(promoOccur, word);
             Instance promoInstance = new DenseInstance(promoVecWord.stream().mapToDouble(d -> d).toArray(), TextType.Promo.toString());
 
-
-
-
             double dest = spearmanRankCorr.measure(perExInstance, promoInstance);
-
-            if (Math.abs(dest) > IRRELEVANT_WORD_THRESHOLD) {
-                System.out.println(dest);
-                System.out.println("vec1: " + perExVecWord + " | " + perExInstance);
-                System.out.println("vec2: " + promoVecWord + " | " + promoInstance);
-                dictionary.add(perExInstance);
-                dictionary.add(promoInstance);
-            }
-
+            destMap.put(word, dest);
         }
-    }
 
-    Set<Instance> classfiy(Instance instance) {
-        DistanceMeasure ed = new EuclideanDistance();
-        return dictionary.kNearest(K_VALUE_KNN, instance, ed);
-    }
+        List<Double> destList = new ArrayList<>(destMap.values());
+        Collections.sort(destList);
 
+        double sum = destList.stream().mapToDouble(Double::doubleValue).sum();
+        double destThreshold = sum * (Settings.avgSpearmanRankCorrelationThreshold / 100);
 
-    public Dataset getDictionary() {
-        return dictionary;
+        for (String key : destMap.keySet()) {
+            if (destMap.get(key) < destThreshold) {
+                perExOccur.remove(key);
+                promoOccur.remove(key);
+            }
+        }
+
+        return new Dictionary(perExOccur,promoOccur);
     }
 }
