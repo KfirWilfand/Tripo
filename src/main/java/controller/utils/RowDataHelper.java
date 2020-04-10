@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.riversun.promise.Func;
 import org.riversun.promise.Promise;
+
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,15 +29,15 @@ public class RowDataHelper {
     }
 
     public void writeTextsFromCsv(String csvWebSitesFilePath) {
-        List<String> linksListPerEx = RowDataHelper.getInstance().readSitesListByType(TextType.PerEx, csvWebSitesFilePath);
-        List<String> linksListPromo = RowDataHelper.getInstance().readSitesListByType(TextType.Promo, csvWebSitesFilePath);
+        List<String> linksListPerEx = RowDataHelper.getInstance().readSitesListByType(TextType.PersonalExperience, csvWebSitesFilePath);
+        List<String> linksListPromo = RowDataHelper.getInstance().readSitesListByType(TextType.Promotion, csvWebSitesFilePath);
 
         for (String link : linksListPromo) {
-            RowDataHelper.getInstance().writeTextFromSitesToDb(link, TextType.PerEx);
+            RowDataHelper.getInstance().writeTextFromSitesToDb(link, TextType.PersonalExperience);
         }
 
         for (String link : linksListPerEx) {
-            RowDataHelper.getInstance().writeTextFromSitesToDb(link, TextType.PerEx);
+            RowDataHelper.getInstance().writeTextFromSitesToDb(link, TextType.PersonalExperience);
         }
     }
 
@@ -53,10 +54,13 @@ public class RowDataHelper {
             if ((record = csvReader.readNext()) != null) {
                 if (record[0].equals(type.toString())) {
                     colNumByType = 0;
-                } else if (record[1] == type.toString()) {
+                } else if (record[1].equals(type.toString())) {
                     colNumByType = 1;
                 }
             }
+
+            if (record == null)
+                throw new NullPointerException("CSV File format is wrong! record is null");
 
             if (colNumByType == -1)
                 throw new CsvValidationException("CSV File format is wrong! Can't read the columns types");
@@ -100,6 +104,7 @@ public class RowDataHelper {
 
                     action.resolve(new Text(link, maxElement.text(), attributeContent, type));
                 } catch (IOException e) {
+                    Logger.log(link + ": " + e.getMessage());
                     e.printStackTrace();
                 }
             }).start();

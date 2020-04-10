@@ -49,6 +49,16 @@ public class TextAdapter {
         return occurList;
     }
 
+    public List<Text> getTextsByType(List<Text> texts,TextType type){
+        List<Text> tempList = new ArrayList<>();
+
+        for(Text text :texts){
+            if(text.getType() == type) tempList.add(text);
+        }
+
+        return tempList;
+    }
+
     public Set<String> getAllWordsFromTexts(List<Text> texts) {
         Set<String> words = new HashSet();
 
@@ -59,7 +69,7 @@ public class TextAdapter {
         return words;
     }
 
-    Set<String> textToWord(String text) {
+    public Set<String> textToWord(String text) {
         String[] words = text.split("\\W");
 
         for (int i = 0; i < words.length; i++) {
@@ -69,4 +79,13 @@ public class TextAdapter {
         return new HashSet<>(Arrays.asList(words));
     }
 
+    public Set<String> textToWordSentences(String text) {
+        String[] words = text.split(".*?\\.(?= [A-Z]|$)");
+
+        for (int i = 0; i < words.length; i++) {
+            words[i] = words[i].toLowerCase();
+        }
+
+        return new HashSet<>(Arrays.asList(words));
+    }
 }

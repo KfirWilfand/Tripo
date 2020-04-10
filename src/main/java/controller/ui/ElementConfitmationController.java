@@ -1,6 +1,5 @@
 package controller.ui;
 
-import controller.MongoDbController;
 import controller.utils.Helper;
 import controller.utils.Logger;
 import controller.utils.TextType;
@@ -42,7 +41,7 @@ public class ElementConfitmationController {
         String content = txaContent.getText();
         String attributes = txfAttributes.getText();
 
-        Logger.warning((new Text(link, content, attributes, TextType.PerEx).getJsonFormat()));
+        Logger.warning((new Text(link, content, attributes, TextType.PersonalExperience).getJsonFormat()));
 
 //        MongoDbController.getInstance().addText(new Text(link, content, attributes));
     }

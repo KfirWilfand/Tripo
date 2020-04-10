@@ -6,12 +6,8 @@ import controller.utils.TextAdapter;
 import controller.utils.TextType;
 import model.Text;
 import model.Dictionary;
-import net.sf.javaml.core.Dataset;
-import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
-import net.sf.javaml.distance.DistanceMeasure;
-import net.sf.javaml.distance.EuclideanDistance;
 import net.sf.javaml.distance.SpearmanRankCorrelation;
 
 
@@ -23,16 +19,15 @@ public class DictionaryBuilder {
     TextAdapter textAdapter;
 
     public DictionaryBuilder() {
-        db = MongoDbController.getInstance();
         textAdapter = TextAdapter.getInstance();
     }
 
-    public Dictionary create() {
-        Set<String> unFilteredWordList = textAdapter.getAllWordsFromTexts(db.getTextsAll());
+    public Dictionary create(List<Text> texts) {
+        Set<String> unFilteredWordList = textAdapter.getAllWordsFromTexts(texts);
 //        unFilteredWordList.removeAll(db.getStopWords());
 
-        List<Text> perExTexts = db.getTextsByType(TextType.PerEx);
-        List<Text> promoTexts = db.getTextsByType(TextType.Promo);
+        List<Text> perExTexts = textAdapter.getTextsByType(texts,TextType.PersonalExperience);
+        List<Text> promoTexts = textAdapter.getTextsByType(texts,TextType.Promotion);
 
         Map<String, Map<String, Double>> perExOccur = textAdapter.getOccur(perExTexts, unFilteredWordList);
         Map<String, Map<String, Double>> promoOccur = textAdapter.getOccur(promoTexts, unFilteredWordList);
@@ -49,10 +44,10 @@ public class DictionaryBuilder {
         for (String word : unFilteredWordList) {
 
             List<Double> perExVecWord = textAdapter.getVectorByWord(perExOccur, word);
-            Instance perExInstance = new DenseInstance(perExVecWord.stream().mapToDouble(d -> d).toArray(), TextType.PerEx.toString());
+            Instance perExInstance = new DenseInstance(perExVecWord.stream().mapToDouble(d -> d).toArray(), TextType.PersonalExperience.toString());
 
             List<Double> promoVecWord = textAdapter.getVectorByWord(promoOccur, word);
-            Instance promoInstance = new DenseInstance(promoVecWord.stream().mapToDouble(d -> d).toArray(), TextType.Promo.toString());
+            Instance promoInstance = new DenseInstance(promoVecWord.stream().mapToDouble(d -> d).toArray(), TextType.Promotion.toString());
 
             double dest = spearmanRankCorr.measure(perExInstance, promoInstance);
             destMap.put(word, dest);

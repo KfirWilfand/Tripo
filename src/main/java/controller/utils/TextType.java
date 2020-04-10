@@ -1,15 +1,15 @@
 package controller.utils;
 
 public enum TextType {
-    PerEx {
+    PersonalExperience {
         @Override
         public String toString() {
-            return "personal_experience";
+            return "PersonalExperience";
         }
-    }, Promo {
+    }, Promotion {
         @Override
         public String toString() {
-            return "promotion";
+            return "Promotion";
         }
     }
 }

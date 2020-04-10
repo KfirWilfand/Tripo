@@ -68,7 +68,7 @@ public class MongoDbController {
             DBObject item = texts.next();
 
             Text text = new Text(
-                    item.get("id").toString(),
+                     item.get("_id").toString(),
                     (String) item.get("link"),
                     (String) item.get("content"),
                     (String) item.get("attributes"),
@@ -94,7 +94,7 @@ public class MongoDbController {
     }
 
     public void addText(Text text) {
-        Logger.debug(text.toString());
+//        Logger.debug(text.toString());
 
         DBCollection collection = database.getCollection("texts");
         DBObject dbObject = (DBObject) JSON.parse(text.getJsonFormat());

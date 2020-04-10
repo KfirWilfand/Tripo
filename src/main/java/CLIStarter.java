@@ -1,3 +1,5 @@
+import controller.ObjectBuilder;
+import controller.Settings;
 import controller.utils.TextType;
 import controller.utils.RowDataHelper;
 
@@ -33,7 +35,10 @@ public class CLIStarter {
 //            e.printStackTrace();
 //        }
 
+        RowDataHelper.getInstance().writeTextsFromCsv(Settings.csvWebSitesFilePath);
 
+        Object test = new ObjectBuilder().build();
+        System.out.println(test);
 
     }
 

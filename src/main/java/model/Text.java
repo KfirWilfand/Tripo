@@ -65,6 +65,7 @@ public class Text {
                 "\"link\":\"" + link + "\"" +
                 ", \"attributes\":\"" + getJsonFriendly(attributes) + "\"" +
                 ", \"content\":\"" + getJsonFriendly(content) + "\"" +
+                ", \"type\":\"" + type + "\"" +
                 "}";
 
     }
