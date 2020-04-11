@@ -2,14 +2,15 @@ package model;
 
 import net.sf.javaml.core.Instance;
 
+import java.util.List;
 import java.util.Map;
 
 public class TextObject {
-    private final Dictionary dictionary;
-    private final Map<String, Sentiment> sentiment;
-    Map<String, Double> wordList;
+    private Map<String, Double>  dictionary;
+    private Sentiment sentiment;
+    private List<String> wordList;
 
-    public TextObject(Dictionary dictionary, Map<String, Sentiment> sentiment) {
+    public TextObject(Map<String, Double>  dictionary, Sentiment sentiment) {
         this.dictionary = dictionary;
         this.sentiment = sentiment;
     }
