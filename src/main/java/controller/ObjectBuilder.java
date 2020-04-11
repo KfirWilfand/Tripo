@@ -20,13 +20,13 @@ public class ObjectBuilder {
         texts = db.getTextsAll();
     }
 
-    public TextObject build(){
-        Dictionary dictionary = new DictionaryBuilder().create(texts);
+    public TextObject build() {
+//        Dictionary dictionary = new DictionaryBuilder().create(texts);
         Map<String, Sentiment> sentiment = new SentimentBuilder().create(texts);
-
-        return new TextObject(dictionary, sentiment);
+        System.out.println(sentiment);
+        return null;
+//        return new TextObject(new Dictionary(), sentiment);
     }
-
 
 
 }

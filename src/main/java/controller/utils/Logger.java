@@ -6,6 +6,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -48,14 +51,14 @@ public class Logger {
 
     public static void log(String msg) {
         try {
-            File file = new File(Settings.siteFailLoadLogFilePath);
+            File file = new File(Settings.siteFailLoadLogFileName);
             if (!file.exists()) {
                 file.createNewFile();
             }
 
             BufferedWriter bw = null;
 
-            bw = new BufferedWriter(new FileWriter(file.getPath(), true));
+            bw = new BufferedWriter(new FileWriter(Settings.siteFailLoadLogFileName, true));
             bw.write(getMsgFormatWithoutAnsi(msg));
             bw.newLine();
             bw.flush();

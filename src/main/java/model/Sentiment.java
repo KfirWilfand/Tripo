@@ -25,6 +25,22 @@ public class Sentiment {
         veryPositiveCountSentences = 0;
     }
 
+    @Override
+    public String toString() {
+        return "Sentiment{" +
+                "veryNegativeCountWords=" + veryNegativeCountWords +
+                ", negativeCountWords=" + negativeCountWords +
+                ", naturalCountWords=" + naturalCountWords +
+                ", positiveCountWords=" + positiveCountWords +
+                ", veryPositiveCountWords=" + veryPositiveCountWords +
+                ", veryNegativeCountSentences=" + veryNegativeCountSentences +
+                ", negativeCountSentences=" + negativeCountSentences +
+                ", naturalCountSentences=" + naturalCountSentences +
+                ", positiveCountSentences=" + positiveCountSentences +
+                ", veryPositiveCountSentences=" + veryPositiveCountSentences +
+                '}';
+    }
+
     public void incVeryNegativeCountWords() {
         this.veryNegativeCountWords++;
     }

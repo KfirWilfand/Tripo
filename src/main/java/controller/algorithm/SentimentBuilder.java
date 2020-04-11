@@ -24,56 +24,60 @@ public class SentimentBuilder {
         Map<String, Sentiment> textSentences = new HashMap<>();
 
         for (Text text : texts) {
-            Sentiment sentiment = new Sentiment();
-            Set<String> words = textAdapter.textToWord(text.getContent());
-            Set<String> sentences = textAdapter.textToWordSentences(text.getContent());
+            new Thread(() -> {
+                Sentiment sentiment = new Sentiment();
+                Set<String> words = textAdapter.textToWord(text.getContent());
+                Set<String> sentences = textAdapter.textToWordSentences(text.getContent());
 
-            for (String word : words) {
+                for (String word : words) {
 
-                int sentimentVal = this.findSentiment(word);
-                switch (sentimentVal) {
-                    case -2:
-                        sentiment.incVeryNegativeCountWords();
-                        break;
-                    case -1:
-                        sentiment.incNegativeCountWords();
-                        break;
-                    case 0:
-                        sentiment.incNaturalCountWords();
-                        break;
-                    case 1:
-                        sentiment.incPositiveCountWords();
-                        break;
-                    case 2:
-                        sentiment.incVeryPositiveCountWords();
-                        break;
+                    int sentimentVal = this.findSentiment(word);
+                    switch (sentimentVal) {
+                        case -2:
+                            sentiment.incVeryNegativeCountWords();
+                            break;
+                        case -1:
+                            sentiment.incNegativeCountWords();
+                            break;
+                        case 0:
+                            sentiment.incNaturalCountWords();
+                            break;
+                        case 1:
+                            sentiment.incPositiveCountWords();
+                            break;
+                        case 2:
+                            sentiment.incVeryPositiveCountWords();
+                            break;
+                    }
                 }
-            }
 
-            for (String sentence : sentences) {
+                for (String sentence : sentences) {
 
-                int sentimentVal = this.findSentiment(sentence);
-                switch (sentimentVal) {
-                    case -2:
-                        sentiment.incVeryNegativeCountSentences();
-                        break;
-                    case -1:
-                        sentiment.incNegativeCountSentences();
-                        break;
-                    case 0:
-                        sentiment.incNaturalCountSentences();
-                        break;
-                    case 1:
-                        sentiment.incPositiveCountSentences();
-                        break;
-                    case 2:
-                        sentiment.incVeryPositiveCountSentences();
-                        break;
+                    int sentimentVal = this.findSentiment(sentence);
+                    switch (sentimentVal) {
+                        case -2:
+                            sentiment.incVeryNegativeCountSentences();
+                            break;
+                        case -1:
+                            sentiment.incNegativeCountSentences();
+                            break;
+                        case 0:
+                            sentiment.incNaturalCountSentences();
+                            break;
+                        case 1:
+                            sentiment.incPositiveCountSentences();
+                            break;
+                        case 2:
+                            sentiment.incVeryPositiveCountSentences();
+                            break;
+                    }
                 }
-            }
 
-            textSentences.put(text.getId(), sentiment);
+                textSentences.put(text.getId(), sentiment);
+                System.out.println(sentiment);
+            }).start();
         }
+        System.out.println(textSentences);
         return textSentences;
     }
 

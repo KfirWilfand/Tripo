@@ -1,5 +1,7 @@
 package model;
 
+import net.sf.javaml.core.Instance;
+
 import java.util.Map;
 
 public class TextObject {
@@ -15,9 +17,16 @@ public class TextObject {
     @Override
     public String toString() {
         return "TextObject{" +
-                "dictionary=" + dictionary +
-                ", sentiment=" + sentiment +
-                ", wordList=" + wordList +
+                "dictionary= " + dictionary +
+                ", sentiment= " + sentiment +
+                ", wordList= " + wordList +
                 '}';
     }
+
+    public Instance getMLInstance(){
+        //Nisim implementation
+        return null;
+    }
+
+
 }
