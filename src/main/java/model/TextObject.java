@@ -54,7 +54,7 @@ public class TextObject {
             arr[i] = InstanceList.get(i);
         Instance perExInstance = new DenseInstance(arr, TextType);
 
-        return null;
+        return perExInstance;
     }
 }
 
