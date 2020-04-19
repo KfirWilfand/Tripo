@@ -2,12 +2,14 @@ package model;
 
 import controller.utils.TextType;
 
+import java.util.Map;
+
 public class Text {
-    String id;
-    String link;
-    String content;
-    String attributes;
-    TextType type;
+    private String id;
+    private String link;
+    private String content;
+    private String attributes;
+    private TextType type;
 
     public Text(String link, String content, String attributes, TextType type) {
         this.link = link;
@@ -90,5 +92,4 @@ public class Text {
                 .replaceAll("\\[", "")
                 .replaceAll("\\]", "");
     }
-
 }

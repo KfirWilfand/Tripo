@@ -37,7 +37,7 @@ public class RowDataHelper {
         }
 
         for (String link : linksListPerEx) {
-            RowDataHelper.getInstance().writeTextFromSitesToDb(link, TextType.PersonalExperience);
+            RowDataHelper.getInstance().writeTextFromSitesToDb(link, TextType.Promotion);
         }
     }
 

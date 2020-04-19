@@ -1,13 +1,22 @@
 package controller.utils;
 
+import com.opencsv.CSVWriter;
+import controller.Settings;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.layout.Pane;
+import net.sf.javaml.core.Dataset;
+import net.sf.javaml.core.Instance;
+import net.sf.javaml.tools.data.FileHandler;
+
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Stream;
 
@@ -40,6 +49,14 @@ public class Helper {
         return contentBuilder.toString();
     }
 
+    public void writeDataToCsv(Dataset data) {
+        try {
+            FileHandler.exportDataset(data,new File(Settings.datasetFileName));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public FXMLLoader layoutSwitcher(Pane parent, String layout) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
@@ -62,5 +79,9 @@ public class Helper {
             return sum.doubleValue() / marks.size();
         }
         return sum;
+    }
+
+    public Dataset loadDataFromCsv() throws IOException {
+        return FileHandler.loadDataset(new File(Settings.datasetFileName));
     }
 }

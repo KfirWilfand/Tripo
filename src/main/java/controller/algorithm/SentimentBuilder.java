@@ -21,10 +21,10 @@ public class SentimentBuilder {
     }
 
     public Map<String, Sentiment> create(List<Text> texts) {
-        Map<String, Sentiment> textSentences = new HashMap<>();
+        Map<String, Sentiment> textSentiments = new HashMap<>();
 
         for (Text text : texts) {
-            new Thread(() -> {
+//            new Thread(() -> {
                 Sentiment sentiment = new Sentiment();
                 Set<String> words = textAdapter.textToWord(text.getContent());
                 Set<String> sentences = textAdapter.textToWordSentences(text.getContent());
@@ -73,12 +73,11 @@ public class SentimentBuilder {
                     }
                 }
 
-                textSentences.put(text.getId(), sentiment);
-                System.out.println(sentiment);
-            }).start();
+                textSentiments.put(text.getId(), sentiment);
+//            }).start();
         }
-        System.out.println(textSentences);
-        return textSentences;
+
+        return textSentiments;
     }
 
     public int findSentiment(String line) {

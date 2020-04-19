@@ -9,28 +9,26 @@ import model.Dictionary;
 import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
 import net.sf.javaml.distance.SpearmanRankCorrelation;
-
+import org.apache.commons.collections.ListUtils;
 
 
 import java.util.*;
 
 public class DictionaryBuilder {
-    MongoDbController db;
-    TextAdapter textAdapter;
+    private TextAdapter textAdapter;
+    private Dictionary dictionary;
 
     public DictionaryBuilder() {
         textAdapter = TextAdapter.getInstance();
     }
 
-    public Dictionary create(List<Text> texts) {
-        Set<String> unFilteredWordList = textAdapter.getAllWordsFromTexts(texts);
-//        unFilteredWordList.removeAll(db.getStopWords());
+    public void init(List<Text> texts, List<Text> perExTexts, List<Text> promoTexts) {
+        List<String> dictionaryWords = new ArrayList<>(textAdapter.getAllWordsFromTexts(texts));
+//        dictionaryWords.removeAll(db.getStopWords());
+//        Map<String, Map<String, Double>> occurMap = textAdapter.getOccur(texts, dictionaryWords);
 
-        List<Text> perExTexts = textAdapter.getTextsByType(texts,TextType.PersonalExperience);
-        List<Text> promoTexts = textAdapter.getTextsByType(texts,TextType.Promotion);
-
-        Map<String, Map<String, Double>> perExOccur = textAdapter.getOccur(perExTexts, unFilteredWordList);
-        Map<String, Map<String, Double>> promoOccur = textAdapter.getOccur(promoTexts, unFilteredWordList);
+        Map<String, Map<String, Double>> perExOccur = textAdapter.getOccur(perExTexts, dictionaryWords);
+        Map<String, Map<String, Double>> promoOccur = textAdapter.getOccur(promoTexts, dictionaryWords);
 
         /*
          * The simplest incarnation of the DenseInstance constructor will only
@@ -41,7 +39,7 @@ public class DictionaryBuilder {
         SpearmanRankCorrelation spearmanRankCorr = new SpearmanRankCorrelation();
 
         Map<String, Double> destMap = new HashMap<>();
-        for (String word : unFilteredWordList) {
+        for (String word : dictionaryWords) {
 
             List<Double> perExVecWord = textAdapter.getVectorByWord(perExOccur, word);
             Instance perExInstance = new DenseInstance(perExVecWord.stream().mapToDouble(d -> d).toArray(), TextType.PersonalExperience.toString());
@@ -61,11 +59,16 @@ public class DictionaryBuilder {
 
         for (String key : destMap.keySet()) {
             if (destMap.get(key) < destThreshold) {
+                dictionaryWords.remove(key);
                 perExOccur.remove(key);
                 promoOccur.remove(key);
             }
         }
 
-        return new Dictionary(perExOccur,promoOccur);
+        this.dictionary = new Dictionary(perExOccur,promoOccur,dictionaryWords);
+    }
+
+    public Dictionary getDictionary() {
+        return dictionary;
     }
 }

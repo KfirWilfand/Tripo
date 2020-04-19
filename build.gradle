@@ -14,11 +14,20 @@ repositories {
         url "http://maven.icm.edu.pl/artifactory/repo/"
     }
 }
+repositories {
+    mavenCentral()
+    maven {
+        name "sourceforge"
+        url "http://neuroph.sourceforge.net/maven2/"
+    }
+}
+
 
 dependencies {
     compile 'org.mongodb:mongo-java-driver:2.12.3'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
     compile group: 'net.sourceforge', name: 'javaml', version: '0.1.5'
+    compile 'be.abeel:ajt:2.9'
     compile "edu.stanford.nlp:stanford-corenlp:3.9.2"
     compile "edu.stanford.nlp:stanford-corenlp:3.9.2:models"
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'

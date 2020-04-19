@@ -2,6 +2,7 @@ package controller.utils;
 
 import model.Text;
 import org.apache.commons.lang3.StringUtils;
+
 import java.util.*;
 
 public class TextAdapter {
@@ -32,28 +33,53 @@ public class TextAdapter {
         return wordVec;
     }
 
-    public Map<String ,Map<String, Double>> getOccur(List<Text> texts, Set<String> words) {
-        Map<String ,Map<String, Double>> occurList = new HashMap<>();
+    public Map<String, Double> calcOccur(Text text, List<String> words) {
+        Map<String, Double> wordOccurText = new HashMap<>();
 
-        for (Text text : texts) {
-            Map<String, Double> wordOccurText = new HashMap<>();
-
-            for (String word : words) {
-                double count = StringUtils.countMatches(text.getContent().toLowerCase(), word);
-                wordOccurText.put(word, count);
-            }
-
-            occurList.put(text.getId(),wordOccurText);
+        String textContent = text.getContent().toLowerCase();
+        for (String word : words) {
+            double count = StringUtils.countMatches(textContent, word);
+            wordOccurText.put(word, count);
         }
 
-        return occurList;
+        return wordOccurText;
     }
 
-    public List<Text> getTextsByType(List<Text> texts,TextType type){
+    public Map<String, Map<String, Double>> getOccur(List<Text> texts, List<String> words) {
+        Map<String,Map<String, Double>> occurMap = new HashMap<>();
+
+        for (Text text : texts) {
+            Map<String, Double> wordOccurText = calcOccur(text, words);
+            occurMap.put(text.getId(),wordOccurText);
+        }
+
+        return occurMap;
+    }
+
+
+//    public Map<String, Map<String, Double>> getOccur(List<Text> texts, Set<String> words) {
+//        Map<String, Map<String, Double>> occurList = new HashMap<>();
+//
+//        for (Text text : texts) {
+//            Map<String, Double> wordOccurText = new HashMap<>();
+//
+//            for (String word : words) {
+//                double count = StringUtils.countMatches(text.getContent().toLowerCase(), word);
+//                wordOccurText.put(word, count);
+//            }
+//
+//            text.setDictionary(wordOccurText);
+//            occurList.put(text.getId(), wordOccurText);
+//        }
+//
+//        return occurList;
+//    }
+
+    public List<Text> getTextsByType(List<Text> texts, TextType type) {
         List<Text> tempList = new ArrayList<>();
 
-        for(Text text :texts){
-            if(text.getType() == type) tempList.add(text);
+        for (Text text : texts) {
+            if (text.getType() == type) tempList.add(text);
         }
 
         return tempList;

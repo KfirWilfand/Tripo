@@ -11,19 +11,25 @@ public class Settings {
     //# Logs
     public static final String siteFailLoadLogFileName = "site_fail_load.log";
 
+    //# Dataset
+    public static final String datasetFileName = "dataset.csv";
+
     //# Algorithms
     public static int avgSpearmanRankCorrelationThreshold = 20;
+    public static int knnKvalue = 3;
 
     //# Text Object Weight
-    public static int dictionaryObjWeight = 1;
-    public static int veryNegativeCountWordsWeight = 1;
-    public static int negativeCountWordsWeight = 1;
-    public static int naturalCountWordsWeight = 1;
-    public static int positiveCountWordsWeight = 1;
-    public static int veryPositiveCountWordsWeight = 1;
-    public static int veryNegativeCountSentencesWeight = 1;
-    public static int negativeCountSentencesWeight = 1;
-    public static int naturalCountSentencesWeight = 1;
-    public static int positiveCountSentencesWeight = 1;
-    public static int veryPositiveCountSentencesWeight = 1;
+    public static double dictionaryObjWeight = 1.0;
+    public static double veryNegativeCountWordsWeight = 1.0;
+    public static double negativeCountWordsWeight = 1.0;
+    public static double naturalCountWordsWeight = 1.0;
+    public static double positiveCountWordsWeight = 1.0;
+    public static double veryPositiveCountWordsWeight = 1.0;
+    public static double veryNegativeCountSentencesWeight = 1.0;
+    public static double negativeCountSentencesWeight = 1.0;
+    public static double naturalCountSentencesWeight = 1.0;
+    public static double positiveCountSentencesWeight = 1.0;
+    public static double veryPositiveCountSentencesWeight = 1.0;
+
+    public static double dictionaryWordWeight = 1.0;
 }
