@@ -1,7 +1,6 @@
 package controller.ui;
 
 import controller.utils.Helper;
-import controller.utils.Logger;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,6 +16,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+import java.io.File;
 
 public class PickHtmlElementController {
     @FXML
@@ -30,6 +33,23 @@ public class PickHtmlElementController {
 
     @FXML
     private Button btnLoad;
+
+    @FXML
+    private Button btnCapture;
+    private WebEngine webEngine;
+
+    @FXML
+    void onCaptureBtnClick(ActionEvent event) {
+        FXMLLoader fxmlLoader = Helper.getInstance().layoutSwitcher(mainPane, "html_element_confirmation.fxml");
+//        Document doc = webEngine.getDocument();
+        Document doc = Jsoup.parseBodyFragment((String) webEngine.executeScript("document.body.outerHTML"));
+        String textContent = doc.text().replaceAll("\\<.*?\\>|\\\\s+|&amp|&nbsp|\\[.*?\\]|\\{.*?\\}","");
+
+        if (fxmlLoader != null) {
+            ((ElementConfitmationController) fxmlLoader.getController()).updateUi(new Text(txfUrlAdress.getText(), textContent));
+        }
+    }
+
 
     /**
      * for communication to the Javascript engine.
@@ -53,16 +73,16 @@ public class PickHtmlElementController {
             @Override
             public void run() {
                 String urlAddresss = txfUrlAdress.getText();
-                WebEngine webEngine = wvMain.getEngine();
-                webEngine.setJavaScriptEnabled(true);
-
-                injectJsCode(webEngine);
-                Logger.info("JS Code have been inject!");
-
+                webEngine = wvMain.getEngine();
+//                webEngine.setJavaScriptEnabled(true);
+//
+//                injectJsCode(webEngine);
+//                Logger.info("JS Code have been inject!");
+//
                 webEngine.getLoadWorker().stateProperty()
                         .addListener((obs, oldValue, newValue) -> {
-                            Logger.info("WebEngine status is " + newValue);
-
+//                            Logger.info("WebEngine status is " + newValue);
+                            txfUrlAdress.setText(webEngine.getLocation());
                         });
 
                 webEngine.load(urlAddresss);
@@ -123,7 +143,7 @@ public class PickHtmlElementController {
                     FXMLLoader fxmlLoader = Helper.getInstance().layoutSwitcher(mainPane, "html_element_confirmation.fxml");
 
                     if (fxmlLoader != null) {
-                        ((ElementConfitmationController) fxmlLoader.getController()).updateUi(new Text(txfUrlAdress.getText(), capture.get("content").toString(), values));
+                        ((ElementConfitmationController) fxmlLoader.getController()).updateUi(new Text(txfUrlAdress.getText(), capture.get("content").toString()));
                     }
 
                 } catch (ParseException e) {

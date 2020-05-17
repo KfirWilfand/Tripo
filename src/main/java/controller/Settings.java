@@ -1,8 +1,12 @@
 package controller;
 
+import java.io.File;
+
 public class Settings {
     //# CSV files
     public static final String csvWebSitesFilePath = "./csv/texts_urls_by_type.csv";
+    public static final String dictionarySpearmanDistanceFileName = "dictionarySpearmanDistance.csv";
+    public static final String sentimentFileName = "sentiment.csv";
 
     //# JS files
     public static final String jsInjectionCaptureByUserFilePath = "./csv/webJsInjection.csv";
@@ -15,7 +19,7 @@ public class Settings {
     public static final String datasetFileName = "dataset.csv";
 
     //# Algorithms
-    public static int avgSpearmanRankCorrelationThreshold = 20;
+    public static double avgSpearmanRankCorrelationThreshold = 20;
     public static int knnKvalue = 3;
 
     //# Text Object Weight
@@ -32,4 +36,13 @@ public class Settings {
     public static double veryPositiveCountSentencesWeight = 1.0;
 
     public static double dictionaryWordWeight = 1.0;
+
+    //#Directories
+    public static String sentimentPath = "./output/sentiment/";
+    public static String outputDirName = "output";
+    public static String sentimentDirName = outputDirName + "/sentiment";
+    public static String dictionaryDirName = outputDirName + "/dictionary";
+    public static String dictionaryWordDirName = dictionaryDirName + "/words";;
+    public static int sizeOfLineInTextArea = 135;
+    public static String dictionaryWordsFileName = "dictionaryWords.csv";
 }

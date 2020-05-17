@@ -49,16 +49,16 @@ public class Logger {
         System.out.println(ANSI_RED + getMsgFormat(msg, "ERROR"));
     }
 
-    public static void log(String msg) {
+    public static void log(String msg, String fileName) {
         try {
-            File file = new File(Settings.siteFailLoadLogFileName);
+            File file = new File(fileName);
             if (!file.exists()) {
                 file.createNewFile();
             }
 
             BufferedWriter bw = null;
 
-            bw = new BufferedWriter(new FileWriter(Settings.siteFailLoadLogFileName, true));
+            bw = new BufferedWriter(new FileWriter(fileName, true));
             bw.write(getMsgFormatWithoutAnsi(msg));
             bw.newLine();
             bw.flush();

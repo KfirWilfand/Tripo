@@ -2,15 +2,12 @@ package controller;
 
 import com.mongodb.*;
 import com.mongodb.util.JSON;
-import controller.utils.Logger;
-import controller.utils.TextType;
-import jdk.nashorn.internal.runtime.Debug;
+import controller.utils.TextTypeEnum;
 import model.Text;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.sf.javaml.utils.MathUtils.eq;
 
@@ -41,7 +38,7 @@ public class MongoDbController {
         }
     }
 
-    public List<Text> getTextsByType(TextType type) {
+    public List<Text> getTextsByType(TextTypeEnum type) {
         return this.getTexts(type);
     }
 
@@ -49,7 +46,7 @@ public class MongoDbController {
         return this.getTexts(null);
     }
 
-    private List<Text> getTexts(TextType type) {
+    private List<Text> getTexts(TextTypeEnum type) {
         DBCollection collection = database.getCollection("texts");
         List<Text> tempTextsList = new ArrayList<Text>();
         tempTextsList.clear();
@@ -71,8 +68,7 @@ public class MongoDbController {
                      item.get("_id").toString(),
                     (String) item.get("link"),
                     (String) item.get("content"),
-                    (String) item.get("attributes"),
-                    TextType.valueOf(((String) item.get("type"))));
+                    TextTypeEnum.valueOf(((String) item.get("type"))));
 
             tempTextsList.add(text);
         }

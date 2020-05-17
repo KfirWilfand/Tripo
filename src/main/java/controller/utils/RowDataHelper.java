@@ -3,11 +3,11 @@ package controller.utils;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import controller.MongoDbController;
+import controller.Settings;
 import model.Text;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.riversun.promise.Func;
 import org.riversun.promise.Promise;
 
@@ -29,19 +29,19 @@ public class RowDataHelper {
     }
 
     public void writeTextsFromCsv(String csvWebSitesFilePath) {
-        List<String> linksListPerEx = RowDataHelper.getInstance().readSitesListByType(TextType.PersonalExperience, csvWebSitesFilePath);
-        List<String> linksListPromo = RowDataHelper.getInstance().readSitesListByType(TextType.Promotion, csvWebSitesFilePath);
+        List<String> linksListPerEx = RowDataHelper.getInstance().readSitesListByType(TextTypeEnum.PersonalExperience, csvWebSitesFilePath);
+        List<String> linksListPromo = RowDataHelper.getInstance().readSitesListByType(TextTypeEnum.Promotion, csvWebSitesFilePath);
 
         for (String link : linksListPromo) {
-            RowDataHelper.getInstance().writeTextFromSitesToDb(link, TextType.PersonalExperience);
+            RowDataHelper.getInstance().writeTextFromSitesToDb(link, TextTypeEnum.PersonalExperience);
         }
 
         for (String link : linksListPerEx) {
-            RowDataHelper.getInstance().writeTextFromSitesToDb(link, TextType.Promotion);
+            RowDataHelper.getInstance().writeTextFromSitesToDb(link, TextTypeEnum.Promotion);
         }
     }
 
-    private List<String> readSitesListByType(TextType type, String csvWebSitesFilePath) {
+    private List<String> readSitesListByType(TextTypeEnum type, String csvWebSitesFilePath) {
         List<String> linksList = new ArrayList<String>();
         URL csvFile = getClass().getClassLoader().getResource(csvWebSitesFilePath);
 
@@ -79,36 +79,9 @@ public class RowDataHelper {
         return linksList;
     }
 
-    private void writeTextFromSitesToDb(String link, TextType type) {
+    private void writeTextFromSitesToDb(String link, TextTypeEnum type) {
 
-        Func getSiteContent = (action, data) -> {
-            new Thread(() -> {
-                try {
-                    Document doc = Jsoup.connect(link).get();
-                    String title = doc.title();
-                    List<Element> elements = doc.body().select(":not(body,html,title,meta,link,img,script,input,form,a,button)");
-
-                    Element maxElement = new Element("div");
-
-                    for (Element element : elements) {
-                        if (maxElement.ownText().length() < element.ownText().length()) {
-                            maxElement = element;
-                        }
-                    }
-
-                    String attributeContent = "";
-                    for (Attribute attribute : maxElement.attributes().asList()) {
-                        attributeContent += (attribute.getValue() + " ");
-                    }
-
-
-                    action.resolve(new Text(link, maxElement.text(), attributeContent, type));
-                } catch (IOException e) {
-                    Logger.log(link + ": " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }).start();
-        };
+        Func getSiteContent = getSiteContent(link, type);
 
         Func writeToDb = (action, data) -> {
             MongoDbController.getInstance().addText((Text) data);
@@ -119,5 +92,37 @@ public class RowDataHelper {
                 .then(new Promise(getSiteContent))
                 .then(new Promise(writeToDb))
                 .start();
+    }
+
+    public Func getSiteContent(String link, TextTypeEnum type) {
+        return (action, data) -> {
+                new Thread(() -> {
+                    try {
+                        Document doc = Jsoup.connect(link).get();
+
+                        String title = doc.title();
+    //                    List<Element> elements = doc.body().select(":not(body,html,title,meta,link,img,script,input,form,a,button)");
+
+    //                    Element maxElement = new Element("div");
+    //
+    //                    for (Element element : elements) {
+    //                        if (maxElement.ownText().length() < element.ownText().length()) {
+    //                            maxElement = element;
+    //                        }
+    //                    }
+
+                        String attributeContent = "";
+                        for (Attribute attribute : doc.body().attributes().asList()) {
+                            attributeContent += (attribute.getValue() + " ");
+                        }
+
+
+                        action.resolve(new Text(link, doc.body().text(), attributeContent, type));
+                    } catch (IOException e) {
+                        Logger.log(link + ": " + e.getMessage(), Settings.siteFailLoadLogFileName);
+                        e.printStackTrace();
+                    }
+                }).start();
+            };
     }
 }

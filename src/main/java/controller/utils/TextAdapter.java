@@ -23,33 +23,33 @@ public class TextAdapter {
 
     }
 
-    public List<Double> getVectorByWord(Map<String , Map<String, Double>> data, String word) {
-        List<Double> wordVec = new ArrayList<Double>();
+    public List<Integer> getVectorByWord(Map<String , Map<String, Integer>> data, String word) {
+        List<Integer> wordVec = new ArrayList<Integer>();
 
-        for (Map<String, Double> textMap : data.values()) {
+        for (Map<String, Integer> textMap : data.values()) {
             wordVec.add(textMap.get(word));
         }
 
         return wordVec;
     }
 
-    public Map<String, Double> calcOccur(Text text, List<String> words) {
-        Map<String, Double> wordOccurText = new HashMap<>();
+    public Map<String, Integer> calcOccur(Text text, List<String> words) {
+        Map<String, Integer> wordOccurText = new HashMap<>();
 
         String textContent = text.getContent().toLowerCase();
         for (String word : words) {
-            double count = StringUtils.countMatches(textContent, word);
+            int count = StringUtils.countMatches(textContent, word);
             wordOccurText.put(word, count);
         }
 
         return wordOccurText;
     }
 
-    public Map<String, Map<String, Double>> getOccur(List<Text> texts, List<String> words) {
-        Map<String,Map<String, Double>> occurMap = new HashMap<>();
+    public Map<String, Map<String, Integer>> getOccur(List<Text> texts, List<String> words) {
+        Map<String,Map<String, Integer>> occurMap = new HashMap<>();
 
         for (Text text : texts) {
-            Map<String, Double> wordOccurText = calcOccur(text, words);
+            Map<String, Integer> wordOccurText = calcOccur(text, words);
             occurMap.put(text.getId(),wordOccurText);
         }
 
@@ -75,7 +75,7 @@ public class TextAdapter {
 //        return occurList;
 //    }
 
-    public List<Text> getTextsByType(List<Text> texts, TextType type) {
+    public List<Text> getTextsByType(List<Text> texts, TextTypeEnum type) {
         List<Text> tempList = new ArrayList<>();
 
         for (Text text : texts) {
@@ -89,29 +89,33 @@ public class TextAdapter {
         Set<String> words = new HashSet();
 
         for (Text text : texts) {
-            words.addAll(textToWord(text.getContent()));
+            words.addAll(textToWordSet(text.getContent()));
         }
 
         return words;
     }
 
-    public Set<String> textToWord(String text) {
+    public Set<String> textToWordSet(String text) {
+        return new HashSet<>(textToWordList(text));
+    }
+
+    public List<String> textToWordList(String text) {
         String[] words = text.split("\\W");
 
         for (int i = 0; i < words.length; i++) {
             words[i] = words[i].toLowerCase();
         }
 
-        return new HashSet<>(Arrays.asList(words));
+        return Arrays.asList(words);
     }
 
-    public Set<String> textToWordSentences(String text) {
-        String[] words = text.split(".*?\\.(?= [A-Z]|$)");
+    public List<String> textToSentences(String text) {
+        String[] sentences = text.split("\\n|\\.(?!\\d)|(?<!\\d)\\.");
 
-        for (int i = 0; i < words.length; i++) {
-            words[i] = words[i].toLowerCase();
+        for (int i = 0; i < sentences.length; i++) {
+            sentences[i] = sentences[i].toLowerCase();
         }
 
-        return new HashSet<>(Arrays.asList(words));
+        return Arrays.asList(sentences);
     }
 }

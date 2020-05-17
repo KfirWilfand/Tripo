@@ -1,15 +1,21 @@
 package controller.ui;
 
+import controller.Settings;
 import controller.utils.Helper;
 import controller.utils.Logger;
-import controller.utils.TextType;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import model.Text;
+import view.ViewStarter;
+
+import java.io.IOException;
 
 public class ElementConfitmationController {
     @FXML
@@ -25,10 +31,8 @@ public class ElementConfitmationController {
     private Button btnCancel;
 
     @FXML
-    private TextField txfAttributes;
-
-    @FXML
     private TextArea txaContent;
+
 
     @FXML
     void onCancelBtnClick(ActionEvent event) {
@@ -38,12 +42,40 @@ public class ElementConfitmationController {
     @FXML
     void onInsetObjectBtnClick(ActionEvent event) {
         String link = txfUrlAdress.getText();
-        String content = txaContent.getText();
-        String attributes = txfAttributes.getText();
+        String content = txaContent.getText().replaceAll("\\n", "");
 
-        Logger.warning((new Text(link, content, attributes, TextType.PersonalExperience).getJsonFormat()));
+        Text text = new Text(link, content);
+        Logger.warning(text.getJsonFormat());
 
-//        MongoDbController.getInstance().addText(new Text(link, content, attributes));
+        try {
+//            FXMLLoader fxmlLoader = new FXMLLoader();
+//            Parent newLoadedPane = fxmlLoader.load(getClass().getClassLoader().getResource("./layouts/object_classification_process.fxml").openStream());
+
+//            if (fxmlLoader != null) {
+//                ((ObjectClassificationProcess) fxmlLoader.getController()).setText(text);
+//            }
+
+
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getClassLoader().getResource("./layouts/object_classification_process.fxml"));
+            ObjectClassificationProcess objectClassificationProcess = new ObjectClassificationProcess();
+//            ObjectClassificationProcess controller = ((ObjectClassificationProcess) loader.getController());
+            loader.setController(objectClassificationProcess);
+
+//            controller.setText(text);
+//            mainPane.getChildren().setAll(newLoadedPane);
+            Parent newLoadedPane = loader.load();
+            Scene scene = new Scene(newLoadedPane);
+            ViewStarter.primaryStage.setScene(scene);
+            ViewStarter.primaryStage.show();
+            objectClassificationProcess.start(text);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     @FXML
@@ -59,7 +91,18 @@ public class ElementConfitmationController {
 
     public void updateUi(Text text) {
         txfUrlAdress.setText(text.getLink());
-        txfAttributes.setText(text.getAttributes());
-        txaContent.setText(text.getContent());
+
+        String textContent = text.getContent();
+        String textContentWithSpaces = "";
+        int textContentSize = textContent.toCharArray().length;
+        int prevIndex = 0;
+        for (int i = 0; i < textContentSize; i++) {
+            if (i != 0 && i % Settings.sizeOfLineInTextArea == 0) {
+                textContentWithSpaces += (textContent.substring(prevIndex, i) + System.lineSeparator());
+                prevIndex = i;
+            }
+        }
+
+        txaContent.setText(textContentWithSpaces);
     }
 }

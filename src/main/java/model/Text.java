@@ -1,35 +1,31 @@
 package model;
 
-import controller.utils.TextType;
-
-import java.util.Map;
+import controller.utils.TextTypeEnum;
 
 public class Text {
     private String id;
     private String link;
     private String content;
-    private String attributes;
-    private TextType type;
+    private TextTypeEnum type;
+    private int numOfWords;
+    private int numOfSentences;
 
-    public Text(String link, String content, String attributes, TextType type) {
+    public Text(String link, String content, TextTypeEnum type) {
         this.link = link;
         this.content = content;
-        this.attributes = attributes;
         this.type = type;
     }
 
-    public Text(String id, String link, String content, String attributes, TextType type) {
+    public Text(String id, String link, String content, TextTypeEnum type) {
         this.id = id;
         this.link = link;
         this.content = content;
-        this.attributes = attributes;
         this.type = type;
     }
 
-    public Text(String link, String content, String attributes) {
+    public Text(String link, String content) {
         this.link = link;
         this.content = content;
-        this.attributes = attributes;
     }
 
     public String getId() {
@@ -44,11 +40,7 @@ public class Text {
         return link;
     }
 
-    public String getAttributes() {
-        return attributes;
-    }
-
-    public TextType getType() {
+    public TextTypeEnum getType() {
         return type;
     }
 
@@ -57,7 +49,6 @@ public class Text {
         return "Text{" +
                 "id='" + id + '\'' +
                 ", link='" + link + '\'' +
-                ", attributes='" + attributes + '\'' +
                 ", content='" + content + '\'' +
                 '}';
     }
@@ -65,7 +56,6 @@ public class Text {
     public String getJsonFormat() {
         return "{" +
                 "\"link\":\"" + link + "\"" +
-                ", \"attributes\":\"" + getJsonFriendly(attributes) + "\"" +
                 ", \"content\":\"" + getJsonFriendly(content) + "\"" +
                 ", \"type\":\"" + type + "\"" +
                 "}";
@@ -91,5 +81,21 @@ public class Text {
                 .replaceAll("\\}", "")
                 .replaceAll("\\[", "")
                 .replaceAll("\\]", "");
+    }
+
+    public void setNumOfWords(int size) {
+        this.numOfWords = size;
+    }
+
+    public void setNumOfSentences(int size) {
+        this.numOfSentences = size;
+    }
+
+    public int getNumOfSentences() {
+        return numOfSentences;
+    }
+
+    public int getNumOfWords() {
+        return numOfWords;
     }
 }

@@ -1,5 +1,10 @@
 package controller.algorithm;
 
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+import controller.Settings;
+import controller.utils.Helper;
+import controller.utils.Logger;
 import controller.utils.TextAdapter;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
@@ -11,7 +16,14 @@ import edu.stanford.nlp.util.CoreMap;
 import model.Sentiment;
 import model.Text;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 public class SentimentBuilder {
     private final TextAdapter textAdapter;
@@ -21,63 +33,115 @@ public class SentimentBuilder {
     }
 
     public Map<String, Sentiment> create(List<Text> texts) {
-        Map<String, Sentiment> textSentiments = new HashMap<>();
+        Logger.info("SentimentBuilder creator process has been started!");
+        Map<String, Sentiment> textSentiments = new ConcurrentHashMap<>();
 
-        for (Text text : texts) {
-//            new Thread(() -> {
-                Sentiment sentiment = new Sentiment();
-                Set<String> words = textAdapter.textToWord(text.getContent());
-                Set<String> sentences = textAdapter.textToWordSentences(text.getContent());
+        if ((new File(Settings.sentimentDirName + "/" + Settings.sentimentFileName)).isFile()) {
+            Logger.info("SentimentBuilder reject creator process!");
 
-                for (String word : words) {
+            return this.load();
+        }
 
-                    int sentimentVal = this.findSentiment(word);
-                    switch (sentimentVal) {
-                        case -2:
-                            sentiment.incVeryNegativeCountWords();
-                            break;
-                        case -1:
-                            sentiment.incNegativeCountWords();
-                            break;
-                        case 0:
-                            sentiment.incNaturalCountWords();
-                            break;
-                        case 1:
-                            sentiment.incPositiveCountWords();
-                            break;
-                        case 2:
-                            sentiment.incVeryPositiveCountWords();
-                            break;
-                    }
-                }
-
-                for (String sentence : sentences) {
-
-                    int sentimentVal = this.findSentiment(sentence);
-                    switch (sentimentVal) {
-                        case -2:
-                            sentiment.incVeryNegativeCountSentences();
-                            break;
-                        case -1:
-                            sentiment.incNegativeCountSentences();
-                            break;
-                        case 0:
-                            sentiment.incNaturalCountSentences();
-                            break;
-                        case 1:
-                            sentiment.incPositiveCountSentences();
-                            break;
-                        case 2:
-                            sentiment.incVeryPositiveCountSentences();
-                            break;
-                    }
-                }
-
+        try {
+            for (Text text : texts) {
+                Sentiment sentiment = getTextSentiment(text);
+                Helper.getInstance().writeSentimentDataToCsv(text, sentiment);
                 textSentiments.put(text.getId(), sentiment);
-//            }).start();
+            }
+        } catch (Exception err) {
+            err.printStackTrace();
         }
 
         return textSentiments;
+    }
+
+    public Map<String, Sentiment> load() {
+        Logger.info("SentimentBuilder loader process has been started!");
+        Map<String, Sentiment> textSentiments = new ConcurrentHashMap<>();
+
+        try {
+            Reader reader = Files.newBufferedReader(Paths.get(Settings.sentimentDirName + "/" + Settings.sentimentFileName));
+            CSVReader csvReader = new CSVReader(reader);
+            // Reading Records One by One in a String array
+            String[] nextRecord;
+            csvReader.readNext();
+            while ((nextRecord = csvReader.readNext()) != null) {
+                textSentiments.put(nextRecord[0], new Sentiment(
+                        Integer.valueOf(nextRecord[2]),
+                        Integer.valueOf(nextRecord[3]),
+                        Integer.valueOf(nextRecord[4]),
+                        Integer.valueOf(nextRecord[5]),
+                        Integer.valueOf(nextRecord[6]),
+                        Integer.valueOf(nextRecord[7]),
+                        Integer.valueOf(nextRecord[8]),
+                        Integer.valueOf(nextRecord[9]),
+                        Integer.valueOf(nextRecord[10]),
+                        Integer.valueOf(nextRecord[11]),
+                        Integer.valueOf(nextRecord[12]),
+                        Integer.valueOf(nextRecord[13])
+                ));
+            }
+        } catch (IOException | CsvValidationException e) {
+            e.printStackTrace();
+        }
+        return textSentiments;
+    }
+
+    public Sentiment getTextSentiment(Text text) {
+
+        Sentiment sentiment = new Sentiment();
+        Set<String> words = textAdapter.textToWordSet(text.getContent());
+        List<String> sentences = textAdapter.textToSentences(text.getContent());
+        sentiment.setNumOfWords(words.size());
+        sentiment.setNumOfSentences(sentences.size());
+
+        for (String word : words) {
+
+            int sentimentVal = findSentiment(word);
+            switch (sentimentVal) {
+                case 0:
+                    sentiment.incVeryNegativeCountWords();
+                    break;
+                case 1:
+                    sentiment.incNegativeCountWords();
+                    break;
+                case 2:
+                    sentiment.incNaturalCountWords();
+                    break;
+                case 3:
+                    sentiment.incPositiveCountWords();
+                    break;
+                case 4:
+                    sentiment.incVeryPositiveCountWords();
+                    break;
+                default:
+                    Logger.error("Invalid sentiment value " + sentimentVal + ":" + word);
+            }
+        }
+
+        for (String sentence : sentences) {
+
+            int sentimentVal = findSentiment(sentence);
+            switch (sentimentVal) {
+                case 0:
+                    sentiment.incVeryNegativeCountSentences();
+                    break;
+                case 1:
+                    sentiment.incNegativeCountSentences();
+                    break;
+                case 2:
+                    sentiment.incNaturalCountSentences();
+                    break;
+                case 3:
+                    sentiment.incPositiveCountSentences();
+                    break;
+                case 4:
+                    sentiment.incVeryPositiveCountSentences();
+                    break;
+            }
+        }
+
+        return sentiment;
     }
 
     public int findSentiment(String line) {

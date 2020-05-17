@@ -1,6 +1,6 @@
 package controller.utils;
 
-public enum TextType {
+public enum TextTypeEnum {
     PersonalExperience {
         @Override
         public String toString() {

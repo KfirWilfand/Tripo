@@ -11,6 +11,8 @@ public class Sentiment {
     int naturalCountSentences;
     int positiveCountSentences;
     int veryPositiveCountSentences;
+    private int numOfSentences;
+    private int numOfWords;
 
     public Sentiment() {
         veryNegativeCountWords = 0;
@@ -23,6 +25,21 @@ public class Sentiment {
         naturalCountSentences = 0;
         positiveCountSentences = 0;
         veryPositiveCountSentences = 0;
+    }
+
+    public Sentiment(int veryNegativeCountWords, int negativeCountWords, int naturalCountWords, int positiveCountWords, int veryPositiveCountWords, int veryNegativeCountSentences, int negativeCountSentences, int naturalCountSentences, int positiveCountSentences, int veryPositiveCountSentences, int numOfSentences, int numOfWords) {
+        this.veryNegativeCountWords = veryNegativeCountWords;
+        this.negativeCountWords = negativeCountWords;
+        this.naturalCountWords = naturalCountWords;
+        this.positiveCountWords = positiveCountWords;
+        this.veryPositiveCountWords = veryPositiveCountWords;
+        this.veryNegativeCountSentences = veryNegativeCountSentences;
+        this.negativeCountSentences = negativeCountSentences;
+        this.naturalCountSentences = naturalCountSentences;
+        this.positiveCountSentences = positiveCountSentences;
+        this.veryPositiveCountSentences = veryPositiveCountSentences;
+        this.numOfSentences = numOfSentences;
+        this.numOfWords = numOfWords;
     }
 
     @Override
@@ -159,5 +176,21 @@ public class Sentiment {
 
     public void setVeryPositiveCountSentences(int veryPositiveCountSentences) {
         this.veryPositiveCountSentences = veryPositiveCountSentences;
+    }
+
+    public void setNumOfWords(int size) {
+        this.numOfWords = size;
+    }
+
+    public void setNumOfSentences(int size) {
+        this.numOfSentences = size;
+    }
+
+    public int getNumOfSentences() {
+        return numOfSentences;
+    }
+
+    public int getNumOfWords() {
+        return numOfWords;
     }
 }

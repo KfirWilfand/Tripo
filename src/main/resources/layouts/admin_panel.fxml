@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<AnchorPane prefHeight="400.0" prefWidth="219.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ui.AdminPanelController">
+   <children>
+      <Text layoutX="14.0" layoutY="49.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Admin Panel">
+         <font>
+            <Font size="36.0" />
+         </font>
+      </Text>
+      <Button layoutX="14.0" layoutY="196.0" mnemonicParsing="false" onAction="#createTrainingSet" prefHeight="27.0" prefWidth="90.0" text="Create" />
+      <Button layoutX="14.0" layoutY="110.0" mnemonicParsing="false" onAction="#loadDataFromSites" prefHeight="27.0" prefWidth="189.0" text="Load Data From Sites" />
+      <Button layoutX="110.0" layoutY="196.0" mnemonicParsing="false" onAction="#loadTrainingSet" prefHeight="27.0" prefWidth="90.0" text="Load" />
+      <Text layoutX="16.0" layoutY="185.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Training Set">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Text>
+      <Line endX="-74.0" endY="76.0" layoutX="274.0" layoutY="79.0" startX="-258.0" startY="76.0" />
+      <Text layoutX="14.0" layoutY="97.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Data Base">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Text>
+      <Text layoutX="16.0" layoutY="289.0" strokeType="OUTSIDE" strokeWidth="0.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Text>
+      <Button layoutX="14.0" layoutY="232.0" mnemonicParsing="false" onAction="#deleteTrainingSet" prefHeight="27.0" prefWidth="189.0" text="Delete" />
+      <Line endX="-74.0" endY="76.0" layoutX="276.0" layoutY="195.0" startX="-258.0" startY="76.0" />
+      <Button layoutX="14.0" layoutY="282.0" mnemonicParsing="false" onAction="#deleteTempFiles" prefHeight="27.0" prefWidth="189.0" text="Delete Temporary files" />
+   </children>
+</AnchorPane>
