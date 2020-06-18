@@ -5,16 +5,22 @@ import controller.utils.TextTypeEnum;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Dictionary {
-    private final List<String> dictionaryWords;
+    private final Set<String> dictionaryWords;
     private final Map<String, Map<String, Integer>> perExOccur;
     private final Map<String, Map<String, Integer>> promoOccur;
 
-    public Dictionary(Map<String, Map<String, Integer>> perExOccur, Map<String, Map<String, Integer>> promoOccur, List<String> dictionaryWords) {
+    public Dictionary(Map<String, Map<String, Integer>> perExOccur, Map<String, Map<String, Integer>> promoOccur, Set<String> dictionaryWords) {
         this.perExOccur = perExOccur;
         this.promoOccur = promoOccur;
         this.dictionaryWords = dictionaryWords;
+    }
+
+
+    public Set<String> getDictionaryWords() {
+        return dictionaryWords;
     }
 
     public Map<String, Map<String, Integer>> getPerExOccur() {
@@ -25,7 +31,7 @@ public class Dictionary {
         return promoOccur;
     }
 
-    public ArrayList<Integer> getOrderTextWordsOccur(Text text) {
+    public ArrayList<Double> getOrderTextWordsOccur(Text text) {
 
         Map<String, Map<String, Integer>> occurList = null;
 
@@ -36,14 +42,14 @@ public class Dictionary {
 
         if(occurList == null) return null;
 
-        Map<String, Integer> textOccur = occurList.get(text.getId());
-        ArrayList<Integer> listOfOccur = new ArrayList<>();
+
+        ArrayList<Double> listOfOccur = new ArrayList<>();
 
         for(String word : dictionaryWords){
-            listOfOccur.add(textOccur.get(word));
+            Map<String, Integer> wordMap = occurList.get(word);
+            listOfOccur.add(wordMap.get(text.getId()).doubleValue());
         }
 
         return listOfOccur;
-
     }
 }

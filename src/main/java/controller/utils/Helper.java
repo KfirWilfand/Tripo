@@ -12,6 +12,7 @@ import model.Sentiment;
 import model.Text;
 import net.sf.javaml.core.Dataset;
 import net.sf.javaml.tools.data.FileHandler;
+import view.ViewMainPageStarter;
 
 import java.io.File;
 import java.io.FileReader;
@@ -61,7 +62,7 @@ public class Helper {
         }
     }
 
-    public FXMLLoader layoutSwitcher(Pane parent, String layout) {
+    public FXMLLoader layoutSwitcher(Pane parent, String layout, String title) {
 
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
@@ -73,6 +74,7 @@ public class Helper {
                     parent.getChildren().setAll(newLoadedPane);
                 }
             });
+            ViewMainPageStarter.primaryStage.setTitle(title);
             return fxmlLoader;
         } catch (IOException e) {
             e.printStackTrace();
@@ -118,8 +120,12 @@ public class Helper {
     }
 
     public void writeSentimentDataToCsv(Text text, Sentiment sentiment) {
+        writeSentimentDataToCsv(text, sentiment, Settings.sentimentFileName);
+    }
+
+    public void writeSentimentDataToCsv(Text text, Sentiment sentiment, String csvFileName) {
         try {
-            File file = new File(Settings.sentimentPath + "/" + Settings.sentimentFileName);
+            File file = new File(Settings.sentimentPath + "/" + csvFileName);
 
             if (file.createNewFile()) {
                 CSVWriter writer = new CSVWriter(new FileWriter(file, true));
@@ -203,7 +209,7 @@ public class Helper {
         }
     }
 
-    public void writeDictionaryWordsCsv(List<String> dictionaryWords) {
+    public void writeDictionaryWordsCsv(Set<String> dictionaryWords) {
         try {
             File file = new File(Settings.dictionaryDirName + "/" + Settings.dictionaryWordsFileName);
 
@@ -224,8 +230,8 @@ public class Helper {
         }
     }
 
-    public List<String> loadDictionaryWordsCsv() {
-        List<String> list = new ArrayList<>();
+    public Set<String> loadDictionaryWordsCsv() {
+        Set<String> list = new HashSet<>();
         String[] word = new String[1];
 
         try {
@@ -245,5 +251,27 @@ public class Helper {
         }
 
         return list;
+    }
+
+    public void writeRejectWordsCSV(String word, String rejectionCause) {
+        try {
+            File file = new File(Settings.dictionaryDirName + "/" + Settings.wordsRejectionFileName);
+
+            if (file.createNewFile()) {
+                CSVWriter writer = new CSVWriter(new FileWriter(file, true));
+                System.out.println("File created: " + file.getName());
+                String[] record = new String[]{"word", "cause"};
+                writer.writeNext(record);
+                writer.close();
+            }
+
+            CSVWriter writer = new CSVWriter(new FileWriter(file, true));
+            String[] record = new String[]{word, rejectionCause};
+            writer.writeNext(record);
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

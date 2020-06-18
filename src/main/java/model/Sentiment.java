@@ -11,8 +11,8 @@ public class Sentiment {
     int naturalCountSentences;
     int positiveCountSentences;
     int veryPositiveCountSentences;
-    private int numOfSentences;
-    private int numOfWords;
+    int numOfSentences;
+    int numOfWords;
 
     public Sentiment() {
         veryNegativeCountWords = 0;
@@ -25,6 +25,8 @@ public class Sentiment {
         naturalCountSentences = 0;
         positiveCountSentences = 0;
         veryPositiveCountSentences = 0;
+        numOfSentences = 0;
+        numOfWords = 0;
     }
 
     public Sentiment(int veryNegativeCountWords, int negativeCountWords, int naturalCountWords, int positiveCountWords, int veryPositiveCountWords, int veryNegativeCountSentences, int negativeCountSentences, int naturalCountSentences, int positiveCountSentences, int veryPositiveCountSentences, int numOfSentences, int numOfWords) {
@@ -56,6 +58,14 @@ public class Sentiment {
                 ", positiveCountSentences=" + positiveCountSentences +
                 ", veryPositiveCountSentences=" + veryPositiveCountSentences +
                 '}';
+    }
+
+    public void incNumOfWords() {
+        this.numOfWords++;
+    }
+
+    public void incNumOfSentences() {
+        this.numOfSentences++;
     }
 
     public void incVeryNegativeCountWords() {
@@ -192,5 +202,9 @@ public class Sentiment {
 
     public int getNumOfWords() {
         return numOfWords;
+    }
+
+    public int getNumOfFields() {
+        return 10;
     }
 }

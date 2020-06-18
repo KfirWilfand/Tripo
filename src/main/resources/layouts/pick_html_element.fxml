@@ -25,7 +25,7 @@
             <Font size="14.0" />
          </font>
       </TextField>
-      <Text layoutX="14.0" layoutY="48.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Trip review classification tool">
+      <Text layoutX="14.0" layoutY="48.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Step1: Load Site">
          <font>
             <Font size="35.0" />
          </font>

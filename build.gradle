@@ -30,7 +30,6 @@ repositories {
     }
 }
 
-
 dependencies {
     compile files('libs/ajt-2.9.jar')
     compile files('libs/commons-math-1.2.jar')
@@ -38,6 +37,11 @@ dependencies {
     compile files('libs/javaml-0.1.7.jar')
     compile files('libs/libsvm.jar')
     compile files('libs/weka.jar')
+    compile files('libs/lucene-snowball-3.0.2.jar')
+    compile files('libs/jazzy0-2-1.jar')
+    compile files('libs/gson-2.8.6.jar')
+    compile files('libs/libtensorflow-1.9.0.jar')
+    compile files('libs/libtensorflow_jni-1.9.0.jar')
     compile 'org.mongodb:mongo-java-driver:2.12.3'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
     compile "edu.stanford.nlp:stanford-corenlp:3.9.2"

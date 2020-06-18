@@ -1,5 +1,6 @@
 package controller.utils;
 
+import model.DataItem;
 import model.Text;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,7 +24,7 @@ public class TextAdapter {
 
     }
 
-    public List<Integer> getVectorByWord(Map<String , Map<String, Integer>> data, String word) {
+    public List<Integer> getVectorByWord(Map<String, Map<String, Integer>> data, String word) {
         List<Integer> wordVec = new ArrayList<Integer>();
 
         for (Map<String, Integer> textMap : data.values()) {
@@ -33,7 +34,18 @@ public class TextAdapter {
         return wordVec;
     }
 
-    public Map<String, Integer> calcOccur(Text text, List<String> words) {
+    public List<DataItem> getDataItemByWord(Map<String, Map<String, Integer>> data, String word) {
+        List<DataItem> dataItem = new ArrayList<DataItem>();
+
+        for (String key : data.keySet()) {
+            dataItem.add(new DataItem(key, data.get(key).get(word)));
+        }
+
+        return dataItem;
+    }
+
+
+    public Map<String, Integer> calcOccur(Text text, Set<String> words) {
         Map<String, Integer> wordOccurText = new HashMap<>();
 
         String textContent = text.getContent().toLowerCase();
@@ -45,12 +57,12 @@ public class TextAdapter {
         return wordOccurText;
     }
 
-    public Map<String, Map<String, Integer>> getOccur(List<Text> texts, List<String> words) {
-        Map<String,Map<String, Integer>> occurMap = new HashMap<>();
+    public Map<String, Map<String, Integer>> getOccur(List<Text> texts, Set<String> words) {
+        Map<String, Map<String, Integer>> occurMap = new HashMap<>();
 
         for (Text text : texts) {
             Map<String, Integer> wordOccurText = calcOccur(text, words);
-            occurMap.put(text.getId(),wordOccurText);
+            occurMap.put(text.getId(), wordOccurText);
         }
 
         return occurMap;

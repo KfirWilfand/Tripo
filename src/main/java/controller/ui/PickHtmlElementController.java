@@ -19,8 +19,6 @@ import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.File;
-
 public class PickHtmlElementController {
     @FXML
     private Pane mainPane;
@@ -40,7 +38,7 @@ public class PickHtmlElementController {
 
     @FXML
     void onCaptureBtnClick(ActionEvent event) {
-        FXMLLoader fxmlLoader = Helper.getInstance().layoutSwitcher(mainPane, "html_element_confirmation.fxml");
+        FXMLLoader fxmlLoader = Helper.getInstance().layoutSwitcher(mainPane, "html_element_confirmation.fxml", "Data Confirmation (2\\4)");
 //        Document doc = webEngine.getDocument();
         Document doc = Jsoup.parseBodyFragment((String) webEngine.executeScript("document.body.outerHTML"));
         String textContent = doc.text().replaceAll("\\<.*?\\>|\\\\s+|&amp|&nbsp|\\[.*?\\]|\\{.*?\\}","");
@@ -140,7 +138,7 @@ public class PickHtmlElementController {
 
                     values = values.replace("[", "").replace("]", "");
 
-                    FXMLLoader fxmlLoader = Helper.getInstance().layoutSwitcher(mainPane, "html_element_confirmation.fxml");
+                    FXMLLoader fxmlLoader = Helper.getInstance().layoutSwitcher(mainPane, "html_element_confirmation.fxml", "Load Site");
 
                     if (fxmlLoader != null) {
                         ((ElementConfitmationController) fxmlLoader.getController()).updateUi(new Text(txfUrlAdress.getText(), capture.get("content").toString()));

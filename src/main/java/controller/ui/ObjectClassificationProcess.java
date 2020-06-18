@@ -1,32 +1,29 @@
 package controller.ui;
 
+import controller.MongoDbController;
+import controller.ObjectLoader;
+import controller.ObjectsBuilder;
 import controller.Settings;
-import controller.algorithm.SentimentBuilder;
-import controller.utils.ClassificationProcessEnum;
-import controller.utils.Helper;
-import controller.utils.Logger;
-import controller.utils.TextAdapter;
-import javafx.application.Platform;
+import controller.utils.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.RadioButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
+import model.Dictionary;
 import model.Sentiment;
 import model.Text;
 import model.TextObject;
 import net.sf.javaml.classification.KNearestNeighbors;
+import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.Instance;
 import net.sf.javaml.filter.normalize.InstanceNormalizeMidrange;
-import net.sf.javaml.tools.data.FileHandler;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -111,6 +108,7 @@ public class ObjectClassificationProcess {
     private ProgressIndicator pbi8;
     private BlinkRunnable blinkRunnable;
     private Thread thread;
+    private Object predictedClassValue;
 
     @FXML
     void onCancelBtnClick(ActionEvent event) {
@@ -120,7 +118,7 @@ public class ObjectClassificationProcess {
             Logger.warning("Thread stop by the user!");
         }
 
-        Helper.getInstance().layoutSwitcher(mainPane, "pick_html_element.fxml");
+        Helper.getInstance().layoutSwitcher(mainPane, "pick_html_element.fxml", "Load Site");
     }
 
     public void start(Text text) {
@@ -128,56 +126,52 @@ public class ObjectClassificationProcess {
         thread.start();
     }
 
+
     public Thread classificationProcessThread(Text text) {
         Runnable runnable = () -> {
-
             updateUi(ClassificationProcessEnum.TextCuptured);
-
             updateUi(ClassificationProcessEnum.LoadDicWords);
-            List<String> dictionaryWords = Helper.getInstance().loadDictionaryWordsCsv();
 
-            TextAdapter textAdapter = TextAdapter.getInstance();
+            MongoDbController db = MongoDbController.getInstance();
+            ObjectLoader objectLoader = new ObjectLoader();
+            ObjectsBuilder objectsBuilder = new ObjectsBuilder();
+            Dictionary dictionary = db.getDictionary();
+            Map<String, Sentiment> sentiments = objectLoader.loadSentiment();
+            List<Text> texts = objectLoader.loadTexts();
+            dictionary = objectsBuilder.getFilteredDictionary(dictionary);
+
 
             updateUi(ClassificationProcessEnum.CalcWordsOccur);
-            Map<String, Integer> textOccurMap = textAdapter.calcOccur(text, dictionaryWords);
 
             updateUi(ClassificationProcessEnum.CreateDictionary);
-            List<Integer> textOccursLst = new ArrayList<>();
-            for (String word : dictionaryWords) {
-                textOccursLst.add(textOccurMap.get(word));
-            }
 
             updateUi(ClassificationProcessEnum.AnalizeSentiment);
-            SentimentBuilder sentimentBuilder = new SentimentBuilder();
-            Sentiment textSentiment = sentimentBuilder.getTextSentiment(text);
 
-            TextObject TextObject = new TextObject(textOccursLst, textSentiment);
+            TextObject object = objectsBuilder.createInstance(text, dictionary);
 
-            DefaultDataset data = null;
-            try {
-                data = (DefaultDataset) FileHandler.loadDataset(new File(Settings.outputDirName + "/" + Settings.datasetFileName), 0);
-            } catch (IOException e) {
-                e.printStackTrace();
+            updateUi(ClassificationProcessEnum.CreatingObject);
+
+            Instance instance = object.getMLInstance();
+
+            updateUi(ClassificationProcessEnum.NormailzeData);
+
+            Dataset data = new DefaultDataset();
+            List<TextObject> objects = objectsBuilder.createInstances(texts, dictionary, sentiments);
+
+            for (TextObject object2 : objects) {
+                data.add(object2.getMLInstance());
             }
 
+            updateUi(ClassificationProcessEnum.KnnClassification);
             KNearestNeighbors knn = new KNearestNeighbors(Settings.knnKvalue);
             knn.buildClassifier(data);
 
-            updateUi(ClassificationProcessEnum.CreatingObject);
-            Instance instance = TextObject.getMLInstance();
-
-            updateUi(ClassificationProcessEnum.NormailzeData);
             InstanceNormalizeMidrange instanceNormalizeMidrange = new InstanceNormalizeMidrange();
-            instanceNormalizeMidrange.filter(instance);
             instanceNormalizeMidrange.filter(data);
+            instanceNormalizeMidrange.filter(instance);
 
-            updateUi(ClassificationProcessEnum.KnnClassification);
-            Object predictedClassValue = knn.classify(instance);
-
+            predictedClassValue = knn.classify(instance);
             updateUi(ClassificationProcessEnum.Finish);
-            System.out.println(predictedClassValue);
-
-
         };
         return new Thread(runnable);
     }
@@ -218,12 +212,12 @@ public class ObjectClassificationProcess {
                 line4.setVisible(true);
                 progBar.setProgress(0.55);
                 pbi4.setProgress(100);
-                blinkRunnable = new BlinkRunnable(rbAnalizeSentiment);
-                blinkRunnable.run();
+//                blinkRunnable = new BlinkRunnable(rbAnalizeSentiment);
+//                blinkRunnable.run();
                 pbi5.setVisible(true);
                 break;
             case CreatingObject:
-                blinkRunnable.shutdown();
+//                blinkRunnable.shutdown();
                 rbCreatingObject.setDisable(false);
                 rbCreatingObject.setSelected(true);
                 line5.setVisible(true);
@@ -249,6 +243,16 @@ public class ObjectClassificationProcess {
                 break;
             case Finish:
                 progBar.setProgress(1);
+
+                FXMLLoader loader = Helper.getInstance().layoutSwitcher(mainPane, "classification_result.fxml", "Classification Result (4\\4)");
+                if (predictedClassValue == null) {
+                    try {
+                        throw new Exception("predictedClassValue is null");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                ((ClassificationResultController) loader.getController()).updateUi(predictedClassValue);
                 break;
         }
     }

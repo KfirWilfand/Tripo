@@ -13,7 +13,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import model.Text;
-import view.ViewStarter;
+import view.ViewMainPageStarter;
 
 import java.io.IOException;
 
@@ -36,7 +36,7 @@ public class ElementConfitmationController {
 
     @FXML
     void onCancelBtnClick(ActionEvent event) {
-        Helper.getInstance().layoutSwitcher(mainPane, "pick_html_element.fxml");
+        Helper.getInstance().layoutSwitcher(mainPane, "pick_html_element.fxml", "Load Site (1\\4)");
     }
 
     @FXML
@@ -48,26 +48,15 @@ public class ElementConfitmationController {
         Logger.warning(text.getJsonFormat());
 
         try {
-//            FXMLLoader fxmlLoader = new FXMLLoader();
-//            Parent newLoadedPane = fxmlLoader.load(getClass().getClassLoader().getResource("./layouts/object_classification_process.fxml").openStream());
-
-//            if (fxmlLoader != null) {
-//                ((ObjectClassificationProcess) fxmlLoader.getController()).setText(text);
-//            }
-
-
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getClassLoader().getResource("./layouts/object_classification_process.fxml"));
             ObjectClassificationProcess objectClassificationProcess = new ObjectClassificationProcess();
-//            ObjectClassificationProcess controller = ((ObjectClassificationProcess) loader.getController());
             loader.setController(objectClassificationProcess);
-
-//            controller.setText(text);
-//            mainPane.getChildren().setAll(newLoadedPane);
             Parent newLoadedPane = loader.load();
             Scene scene = new Scene(newLoadedPane);
-            ViewStarter.primaryStage.setScene(scene);
-            ViewStarter.primaryStage.show();
+            ViewMainPageStarter.primaryStage.setScene(scene);
+            ViewMainPageStarter.primaryStage.setTitle("Object Classification Process (3\\4)");
+            ViewMainPageStarter.primaryStage.show();
             objectClassificationProcess.start(text);
 
 

@@ -15,6 +15,7 @@ import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class RowDataHelper {
     // static variable single_instance of type Singleton
@@ -79,7 +80,7 @@ public class RowDataHelper {
         return linksList;
     }
 
-    private void writeTextFromSitesToDb(String link, TextTypeEnum type) {
+    public void writeTextFromSitesToDb(String link, TextTypeEnum type) {
 
         Func getSiteContent = getSiteContent(link, type);
 
@@ -99,7 +100,11 @@ public class RowDataHelper {
                 new Thread(() -> {
                     try {
                         Document doc = Jsoup.connect(link).get();
-
+                        try {
+                            TimeUnit.SECONDS.sleep(1);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                         String title = doc.title();
     //                    List<Element> elements = doc.body().select(":not(body,html,title,meta,link,img,script,input,form,a,button)");
 
@@ -117,7 +122,7 @@ public class RowDataHelper {
                         }
 
 
-                        action.resolve(new Text(link, doc.body().text(), attributeContent, type));
+                        action.resolve(new Text(link, doc.body().text(), type));
                     } catch (IOException e) {
                         Logger.log(link + ": " + e.getMessage(), Settings.siteFailLoadLogFileName);
                         e.printStackTrace();

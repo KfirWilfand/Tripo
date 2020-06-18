@@ -21,11 +21,11 @@ public class DictionaryBuilder {
         textAdapter = TextAdapter.getInstance();
     }
 
-    public void init(List<Text> texts, List<Text> perExTexts, List<Text> promoTexts) {
+    public Dictionary init(List<Text> texts, List<Text> perExTexts, List<Text> promoTexts, Set<String> dictionaryWords) {
         Logger.info("DictionaryBuilder initialization process has been started!");
-        List<String> dictionaryWords = new ArrayList<>(textAdapter.getAllWordsFromTexts(texts));
+//        List<String> dictionaryWords = new ArrayList<>(textAdapter.getAllWordsFromTexts(texts));
 //        dictionaryWords.removeAll(db.getStopWords());
-//        Map<String, Map<String, Double>> occurMap = textAdapter.getOccur(texts, dictionaryWords);
+//        Map<String, Map<String, Integer>> occurMap = textAdapter.getOccur(texts, dictionaryWords);
 
         Map<String, Map<String, Integer>> perExOccur = textAdapter.getOccur(perExTexts, dictionaryWords);
         Map<String, Map<String, Integer>> promoOccur = textAdapter.getOccur(promoTexts, dictionaryWords);
@@ -73,7 +73,6 @@ public class DictionaryBuilder {
             keysToRemove.add(destList.get(i));
         }
 
-
         boolean isWordToRemove;
         for (String key : destMap.keySet()) {
             isWordToRemove = false;
@@ -83,9 +82,10 @@ public class DictionaryBuilder {
             }
             Helper.getInstance().writeDictionaryDataToCsv(key, destMap.get(key), isWordToRemove);
         }
+
         Logger.info("Dictionary is ready to use!");
         Helper.getInstance().writeDictionaryWordsCsv(dictionaryWords);
-        this.dictionary = new Dictionary(perExOccur, promoOccur, dictionaryWords);
+        return new Dictionary(perExOccur, promoOccur, dictionaryWords);
     }
 
     public Dictionary getDictionary() {
