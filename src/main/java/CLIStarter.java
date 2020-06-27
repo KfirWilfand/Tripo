@@ -16,6 +16,8 @@ import org.tensorflow.*;
 
 public class CLIStarter {
     public static void main(String[] args) {
+//        Set<String> dic = MongoDbController.getInstance().getDictionaryWord();
+//        MongoDbController.getInstance().addDictionaryWords(dic);
 //        createTrainingSet();
 
 //        Set<String> dictionaryWords = new HashSet<>();
@@ -30,14 +32,14 @@ public class CLIStarter {
 //        createDirectories();
 //        createTrainingSet();
 
-        MongoDbController db = MongoDbController.getInstance();
-        Dictionary dictionary = db.getDictionary();
-
-        ObjectsBuilder objectsBuilder = new ObjectsBuilder();
-
-        List<Text> personalExperienceTexts = db.getTestTexts(TextTypeEnum.PersonalExperience);
-        List<Text> promotionTexts = db.getTestTexts(TextTypeEnum.Promotion);
-
+//        MongoDbController db = MongoDbController.getInstance();
+//        Dictionary dictionary = db.getDictionary();
+//
+//        ObjectsBuilder objectsBuilder = new ObjectsBuilder();
+//
+//        List<Text> personalExperienceTexts = db.getTestTexts(TextTypeEnum.PersonalExperience);
+//        List<Text> promotionTexts = db.getTestTexts(TextTypeEnum.Promotion);
+//
 
 
 //        List<Text> texts = db.getTextsAll();

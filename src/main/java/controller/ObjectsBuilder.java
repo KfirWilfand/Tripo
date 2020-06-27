@@ -292,6 +292,8 @@ public class ObjectsBuilder {
             Integer res = (textOucrr.get(word));
             if (res != null) {
                 orderTextOucrr.add((textOucrr.get(word)).doubleValue());
+            } else {
+                orderTextOucrr.add(0.0);
             }
         }
         TextObject textObject = new TextObject(orderTextOucrr, sentiment);
@@ -336,12 +338,16 @@ public class ObjectsBuilder {
     }
 
     public Dictionary getFilteredDictionary(Dictionary dictionary) {
-        Set<String> dictionaryWords = dictionary.getDictionaryWords();
+//        Set<String> dictionaryWords = dictionary.getDictionaryWords();
+        List<String> dictionaryWords = MongoDbController.getInstance().getDictionaryWord();
+        Set<String> newDictionaryWords = new HashSet<>();
         Map<String, Map<String, Integer>> perExOccur = dictionary.getPerExOccur();
         Map<String, Map<String, Integer>> promoOccur = dictionary.getPromoOccur();
         Set<String> wordsToRemove = new HashSet<>();
+        List<Integer> rejectionWordsIndexs = new ArrayList<>();
 
-        for (String word : dictionaryWords) {
+        for (int i = 0; i < dictionaryWords.size(); i++) {
+            String word = dictionaryWords.get(i);
             Map<String, Integer> perExMap = perExOccur.get(word);
             Map<String, Integer> promoMap = promoOccur.get(word);
 
@@ -355,6 +361,7 @@ public class ObjectsBuilder {
             if (totPerExOccurr < Settings.wordOccurTH && totPromoOccurr < Settings.wordOccurTH) {
                 wordsToRemove.add(word);
                 isWordDeletedByWordOccurTH = true;
+//                rejectionWordsIndexs.add(i);
             }
 
             if (!isWordDeletedByWordOccurTH) {
@@ -365,14 +372,20 @@ public class ObjectsBuilder {
 
                 double dest = spearmanRankCorr.measure(perExInstance, promoInstance);
 
+//                if (Math.abs(dest) < Settings.spearmanRankCorrelationThreshold) {
+//                    wordsToRemove.add(word);
+//                    rejectionWordsIndexs.add(i);
+//                }
+
                 if (Math.abs(dest) < Settings.spearmanRankCorrelationThreshold) {
-                    wordsToRemove.add(word);
+                    newDictionaryWords.add(word);
+                    rejectionWordsIndexs.add(i);
                 }
             }
         }
 
-        dictionaryWords.removeAll(wordsToRemove);
-        return new Dictionary(perExOccur, promoOccur, dictionaryWords);
+//        dictionaryWords.removeAll(wordsToRemove);
+        return new Dictionary(perExOccur, promoOccur, newDictionaryWords,rejectionWordsIndexs);
     }
 
     public int getTotalOccur(Collection<Integer> values) {

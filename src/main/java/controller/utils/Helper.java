@@ -74,7 +74,11 @@ public class Helper {
                     parent.getChildren().setAll(newLoadedPane);
                 }
             });
-            ViewMainPageStarter.primaryStage.setTitle(title);
+            try {
+                ViewMainPageStarter.primaryStage.setTitle(title);
+            } catch (Exception ex) {
+//                ex.printStackTrace();
+            }
             return fxmlLoader;
         } catch (IOException e) {
             e.printStackTrace();

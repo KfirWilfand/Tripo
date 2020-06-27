@@ -11,11 +11,19 @@ public class Dictionary {
     private final Set<String> dictionaryWords;
     private final Map<String, Map<String, Integer>> perExOccur;
     private final Map<String, Map<String, Integer>> promoOccur;
+    private List<Integer> rejectionWordsIndexs = null;
 
     public Dictionary(Map<String, Map<String, Integer>> perExOccur, Map<String, Map<String, Integer>> promoOccur, Set<String> dictionaryWords) {
         this.perExOccur = perExOccur;
         this.promoOccur = promoOccur;
         this.dictionaryWords = dictionaryWords;
+    }
+
+    public Dictionary(Map<String, Map<String, Integer>> perExOccur, Map<String, Map<String, Integer>> promoOccur, Set<String> dictionaryWords, List<Integer> rejectionWordsIndexs) {
+        this.perExOccur = perExOccur;
+        this.promoOccur = promoOccur;
+        this.dictionaryWords = dictionaryWords;
+        this.rejectionWordsIndexs = rejectionWordsIndexs;
     }
 
 
@@ -51,5 +59,9 @@ public class Dictionary {
         }
 
         return listOfOccur;
+    }
+
+    public List<Integer> getRejectionWordsIndexs() {
+        return rejectionWordsIndexs;
     }
 }

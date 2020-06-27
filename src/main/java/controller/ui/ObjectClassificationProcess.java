@@ -23,6 +23,7 @@ import net.sf.javaml.core.Dataset;
 import net.sf.javaml.core.DefaultDataset;
 import net.sf.javaml.core.Instance;
 import net.sf.javaml.filter.normalize.InstanceNormalizeMidrange;
+import view.ViewMainPageStarter;
 
 import java.util.List;
 import java.util.Map;
@@ -106,179 +107,181 @@ public class ObjectClassificationProcess {
 
     @FXML
     private ProgressIndicator pbi8;
-    private BlinkRunnable blinkRunnable;
-    private Thread thread;
-    private Object predictedClassValue;
+
+    private OnDoneEventListener processListener;
+
+    class OnDoneEventListener {
+
+        public void onDoneEvent(Object predictedClassValue) {
+            Logger.debug("Performing callback after Asynchronous Task");
+
+            FXMLLoader loader = Helper.getInstance().layoutSwitcher(mainPane, "classification_result.fxml", "Classification Result (4\\4)");
+            if (predictedClassValue == null) {
+                try {
+                    throw new Exception("predictedClassValue is null");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            ((ClassificationResultController) loader.getController()).updateUi(predictedClassValue);
+            ViewMainPageStarter.primaryStage.setTitle("Finish: Classification Result (4\\4)");
+        }
+    }
 
     @FXML
     void onCancelBtnClick(ActionEvent event) {
-        try {
-            thread.interrupt();
-        } catch (Exception e) {
-            Logger.warning("Thread stop by the user!");
-        }
-
         Helper.getInstance().layoutSwitcher(mainPane, "pick_html_element.fxml", "Load Site");
     }
 
     public void start(Text text) {
-        thread = classificationProcessThread(text);
-        thread.start();
+        ClassificationProcessThread classificationProcessThread = new ClassificationProcessThread(text);
+        OnDoneEventListener mListener = new OnDoneEventListener();
+        classificationProcessThread.registerOnDoneEventListener(mListener);
+        classificationProcessThread.run();
     }
 
 
-    public Thread classificationProcessThread(Text text) {
-        Runnable runnable = () -> {
-            updateUi(ClassificationProcessEnum.TextCuptured);
-            updateUi(ClassificationProcessEnum.LoadDicWords);
+    public class ClassificationProcessThread {
+        private OnDoneEventListener mListener;
+        private Text text;
+        private Object predictedClassValue;
 
-            MongoDbController db = MongoDbController.getInstance();
-            ObjectLoader objectLoader = new ObjectLoader();
-            ObjectsBuilder objectsBuilder = new ObjectsBuilder();
-            Dictionary dictionary = db.getDictionary();
-            Map<String, Sentiment> sentiments = objectLoader.loadSentiment();
-            List<Text> texts = objectLoader.loadTexts();
-            dictionary = objectsBuilder.getFilteredDictionary(dictionary);
+        public ClassificationProcessThread(Text text) {
+            this.text = text;
+        }
+
+        public void registerOnDoneEventListener(OnDoneEventListener mListener) {
+            this.mListener = mListener;
+        }
 
 
-            updateUi(ClassificationProcessEnum.CalcWordsOccur);
+        // My Asynchronous task
+        public void run() {
+            // An Async task always executes in new thread
+            new Thread(new Runnable() {
+                public void run() {
+                    updateUi(ClassificationProcessEnum.TextCuptured);
+                    updateUi(ClassificationProcessEnum.LoadDicWords);
 
-            updateUi(ClassificationProcessEnum.CreateDictionary);
+                    MongoDbController db = MongoDbController.getInstance();
+                    ObjectLoader objectLoader = new ObjectLoader();
+                    ObjectsBuilder objectsBuilder = new ObjectsBuilder();
+                    Dictionary dictionary = db.getDictionary();
+                    Map<String, Sentiment> sentiments = objectLoader.loadSentiment();
+                    List<Text> texts = objectLoader.loadTexts();
+                    dictionary = objectsBuilder.getFilteredDictionary(dictionary);
 
-            updateUi(ClassificationProcessEnum.AnalizeSentiment);
 
-            TextObject object = objectsBuilder.createInstance(text, dictionary);
+                    updateUi(ClassificationProcessEnum.CalcWordsOccur);
 
-            updateUi(ClassificationProcessEnum.CreatingObject);
+                    updateUi(ClassificationProcessEnum.CreateDictionary);
 
-            Instance instance = object.getMLInstance();
+                    updateUi(ClassificationProcessEnum.AnalizeSentiment);
 
-            updateUi(ClassificationProcessEnum.NormailzeData);
+                    TextObject object = objectsBuilder.createInstance(text, dictionary);
 
-            Dataset data = new DefaultDataset();
-            List<TextObject> objects = objectsBuilder.createInstances(texts, dictionary, sentiments);
+                    updateUi(ClassificationProcessEnum.CreatingObject);
 
-            for (TextObject object2 : objects) {
-                data.add(object2.getMLInstance());
-            }
+                    Instance instance = object.getMLInstance();
 
-            updateUi(ClassificationProcessEnum.KnnClassification);
-            KNearestNeighbors knn = new KNearestNeighbors(Settings.knnKvalue);
-            knn.buildClassifier(data);
+                    updateUi(ClassificationProcessEnum.NormailzeData);
 
-            InstanceNormalizeMidrange instanceNormalizeMidrange = new InstanceNormalizeMidrange();
-            instanceNormalizeMidrange.filter(data);
-            instanceNormalizeMidrange.filter(instance);
+                    Dataset data = new DefaultDataset();
+                    List<TextObject> objects = objectsBuilder.createInstances(texts, dictionary, sentiments);
 
-            predictedClassValue = knn.classify(instance);
-            updateUi(ClassificationProcessEnum.Finish);
-        };
-        return new Thread(runnable);
-    }
+                    for (TextObject object2 : objects) {
+                        data.add(object2.getMLInstance());
+                    }
 
-    public void updateUi(ClassificationProcessEnum state) {
-        switch (state) {
-            case TextCuptured:
-                progBar.setProgress(0.11);
-                progBar.getParent();
-                pbi1.setProgress(100);
-            case LoadDicWords:
-                rbLoadDicWords.setDisable(false);
-                rbLoadDicWords.setSelected(true);
-                line1.setVisible(true);
-                progBar.setProgress(0.22);
-                pbi1.setProgress(100);
-                pbi2.setVisible(true);
-                break;
-            case CalcWordsOccur:
-                rbCalcWordsOccur.setDisable(false);
-                rbCalcWordsOccur.setSelected(true);
-                line2.setVisible(true);
-                progBar.setProgress(0.33);
-                pbi2.setProgress(100);
-                pbi3.setVisible(true);
-                break;
-            case CreateDictionary:
-                rbCreateDictionary.setDisable(false);
-                rbCreateDictionary.setSelected(true);
-                line3.setVisible(true);
-                progBar.setProgress(0.44);
-                pbi3.setProgress(100);
-                pbi4.setVisible(true);
-                break;
-            case AnalizeSentiment:
-                rbAnalizeSentiment.setDisable(false);
-                rbAnalizeSentiment.setSelected(true);
-                line4.setVisible(true);
-                progBar.setProgress(0.55);
-                pbi4.setProgress(100);
+                    updateUi(ClassificationProcessEnum.KnnClassification);
+                    KNearestNeighbors knn = new KNearestNeighbors(Settings.knnKvalue);
+                    knn.buildClassifier(data);
+
+                    InstanceNormalizeMidrange instanceNormalizeMidrange = new InstanceNormalizeMidrange();
+                    instanceNormalizeMidrange.filter(data);
+                    instanceNormalizeMidrange.filter(instance);
+
+                    predictedClassValue = knn.classify(instance);
+                    updateUi(ClassificationProcessEnum.Finish);
+                }
+            }).start();
+        }
+
+        public void updateUi(ClassificationProcessEnum state) {
+            switch (state) {
+                case TextCuptured:
+                    progBar.setProgress(0.11);
+                    progBar.getParent();
+                    pbi1.setProgress(100);
+                case LoadDicWords:
+                    rbLoadDicWords.setDisable(false);
+                    rbLoadDicWords.setSelected(true);
+                    line1.setVisible(true);
+                    progBar.setProgress(0.22);
+                    pbi1.setProgress(100);
+                    pbi2.setVisible(true);
+                    break;
+                case CalcWordsOccur:
+                    rbCalcWordsOccur.setDisable(false);
+                    rbCalcWordsOccur.setSelected(true);
+                    line2.setVisible(true);
+                    progBar.setProgress(0.33);
+                    pbi2.setProgress(100);
+                    pbi3.setVisible(true);
+                    break;
+                case CreateDictionary:
+                    rbCreateDictionary.setDisable(false);
+                    rbCreateDictionary.setSelected(true);
+                    line3.setVisible(true);
+                    progBar.setProgress(0.44);
+                    pbi3.setProgress(100);
+                    pbi4.setVisible(true);
+                    break;
+                case AnalizeSentiment:
+                    rbAnalizeSentiment.setDisable(false);
+                    rbAnalizeSentiment.setSelected(true);
+                    line4.setVisible(true);
+                    progBar.setProgress(0.55);
+                    pbi4.setProgress(100);
 //                blinkRunnable = new BlinkRunnable(rbAnalizeSentiment);
 //                blinkRunnable.run();
-                pbi5.setVisible(true);
-                break;
-            case CreatingObject:
+                    pbi5.setVisible(true);
+                    break;
+                case CreatingObject:
 //                blinkRunnable.shutdown();
-                rbCreatingObject.setDisable(false);
-                rbCreatingObject.setSelected(true);
-                line5.setVisible(true);
-                progBar.setProgress(0.66);
-                pbi5.setProgress(100);
-                pbi6.setVisible(true);
-                break;
-            case NormailzeData:
-                rbNormailzeData.setDisable(false);
-                rbNormailzeData.setSelected(true);
-                line6.setVisible(true);
-                progBar.setProgress(0.77);
-                pbi6.setProgress(100);
-                pbi7.setVisible(true);
-                break;
-            case KnnClassification:
-                line7.setVisible(true);
-                rbKnnClassification.setDisable(false);
-                rbKnnClassification.setSelected(true);
-                progBar.setProgress(0.88);
-                pbi7.setProgress(100);
-                pbi8.setVisible(true);
-                break;
-            case Finish:
-                progBar.setProgress(1);
+                    rbCreatingObject.setDisable(false);
+                    rbCreatingObject.setSelected(true);
+                    line5.setVisible(true);
+                    progBar.setProgress(0.66);
+                    pbi5.setProgress(100);
+                    pbi6.setVisible(true);
+                    break;
+                case NormailzeData:
+                    rbNormailzeData.setDisable(false);
+                    rbNormailzeData.setSelected(true);
+                    line6.setVisible(true);
+                    progBar.setProgress(0.77);
+                    pbi6.setProgress(100);
+                    pbi7.setVisible(true);
+                    break;
+                case KnnClassification:
+                    line7.setVisible(true);
+                    rbKnnClassification.setDisable(false);
+                    rbKnnClassification.setSelected(true);
+                    progBar.setProgress(0.88);
+                    pbi7.setProgress(100);
+                    pbi8.setVisible(true);
+                    break;
+                case Finish:
+                    progBar.setProgress(1);
 
-                FXMLLoader loader = Helper.getInstance().layoutSwitcher(mainPane, "classification_result.fxml", "Classification Result (4\\4)");
-                if (predictedClassValue == null) {
-                    try {
-                        throw new Exception("predictedClassValue is null");
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    // check if listener is registered.
+                    if (mListener != null) {
+                        mListener.onDoneEvent(predictedClassValue);
                     }
-                }
-                ((ClassificationResultController) loader.getController()).updateUi(predictedClassValue);
-                break;
-        }
-    }
-
-
-    public class BlinkRunnable implements Runnable {
-        private volatile boolean shutdown = false;
-        RadioButton rb;
-
-        BlinkRunnable(RadioButton rb) {
-            this.rb = rb;
-        }
-
-        public void run() {
-            while (!shutdown) {
-                try {
-                    rb.setSelected(!rb.isSelected());
-                    Thread.sleep(650);
-                } catch (InterruptedException e) {
-                    Logger.warning("Thread interrupted by the user!");
-                }
+                    break;
             }
-        }
-
-        public void shutdown() {
-            shutdown = true;
         }
     }
 }

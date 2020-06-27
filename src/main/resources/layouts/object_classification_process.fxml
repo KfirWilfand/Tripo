@@ -16,7 +16,7 @@
                 <Font size="35.0" />
             </font>
         </Text>
-      <Button fx:id="btnCancel" layoutX="601.0" layoutY="765.0" mnemonicParsing="false" onAction="#onCancelBtnClick" prefHeight="44.0" prefWidth="216.0" text="Cancel" textFill="#dd0000">
+      <Button fx:id="btnCancel" layoutX="601.0" layoutY="761.0" mnemonicParsing="false" onAction="#onCancelBtnClick" prefHeight="44.0" prefWidth="216.0" text="Cancel" textFill="#dd0000">
          <font>
             <Font name="System Bold" size="22.0" />
          </font>
@@ -38,7 +38,7 @@
             <Font size="22.0" />
          </font>
       </RadioButton>
-      <RadioButton fx:id="rbCreateDictionary" disable="true" layoutX="63.0" layoutY="361.0" mnemonicParsing="false" text="Creating Dictionary">
+      <RadioButton fx:id="rbCreateDictionary" disable="true" layoutX="63.0" layoutY="361.0" mnemonicParsing="false" text="Analyze Dictionary">
          <font>
             <Font size="22.0" />
          </font>

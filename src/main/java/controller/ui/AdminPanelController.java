@@ -117,11 +117,11 @@ public class AdminPanelController {
             writeToLocalLogger("veryNegativeCountWordsWeight value set to: " + newValue);
         });
         spNegWords.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
-            Settings.negativeCountWordsWeight = new Double(newValue);;
+            Settings.negativeCountWordsWeight = new Double(newValue);
             writeToLocalLogger("negativeCountWordsWeight value set to: " + newValue);
         });
         spNaturalWords.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
-            Settings.naturalCountWordsWeight = new Double(newValue);;
+            Settings.naturalCountWordsWeight = new Double(newValue);
             writeToLocalLogger("naturalCountWordsWeight value set to: " + newValue);
         });
         spPosWords.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
@@ -304,7 +304,7 @@ public class AdminPanelController {
                 Map<String, String> objectsForTestTypes = db.getTestObjectsTypes();
 
                 for (TextObject object : objectsForTest) {
-                    Instance instance = object.getMLInstance();
+                    Instance instance = object.getMLInstance(dictionary.getRejectionWordsIndexs());
                     instanceNormalizeMidrange.filter(instance);
                     Object predictedClassValue = knn.classify(instance);
                     writeToLocalLogger(object.get_id() +" (" +objectsForTestTypes.get(object.get_id()) + ") ?=" + predictedClassValue);

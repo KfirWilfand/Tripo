@@ -24,16 +24,16 @@ public class Settings {
 
     //# Text Object Weight
     public static double dictionaryObjWeight = 1.0;
-    public static double veryNegativeCountWordsWeight = 1.0;
-    public static double negativeCountWordsWeight = 20.0;
-    public static double naturalCountWordsWeight = 1.0;
-    public static double positiveCountWordsWeight = 1.0;
-    public static double veryPositiveCountWordsWeight = 40.0;
+    public static double veryNegativeCountWordsWeight = 0.0;
+    public static double negativeCountWordsWeight = 0.0;
+    public static double naturalCountWordsWeight = 0.0;
+    public static double positiveCountWordsWeight = 0.0;
+    public static double veryPositiveCountWordsWeight = 0.0;
     public static double veryNegativeCountSentencesWeight = 0.0;
-    public static double negativeCountSentencesWeight = 1.0;
+    public static double negativeCountSentencesWeight = 0.0;
     public static double naturalCountSentencesWeight = 0.0;
-    public static double positiveCountSentencesWeight = 1.0;
-    public static double veryPositiveCountSentencesWeight = 1.0;
+    public static double positiveCountSentencesWeight = 0.0;
+    public static double veryPositiveCountSentencesWeight = 0.0;
 
     public static double dictionaryWordWeight = 1;
 
@@ -48,5 +48,5 @@ public class Settings {
     public static int minSizeOfWord = 1;
     public static String wordsRejectionFileName = "wordsRejectionList.csv";
     public static int wordOccurTH = 1;
-    public static double spearmanRankCorrelationThreshold = 0.99;
+    public static double spearmanRankCorrelationThreshold = 0.9999999;
 }

@@ -53,7 +53,7 @@ public class ElementConfitmationController {
             ObjectClassificationProcess objectClassificationProcess = new ObjectClassificationProcess();
             loader.setController(objectClassificationProcess);
             Parent newLoadedPane = loader.load();
-            Scene scene = new Scene(newLoadedPane);
+            Scene scene = new Scene(newLoadedPane, 830, 880);
             ViewMainPageStarter.primaryStage.setScene(scene);
             ViewMainPageStarter.primaryStage.setTitle("Object Classification Process (3\\4)");
             ViewMainPageStarter.primaryStage.show();

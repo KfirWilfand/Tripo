@@ -21,8 +21,10 @@ public class MongoDbController {
     private final String databaseName = "tripo";
     private final String dictionaryWordsCollection = "dictionary_words2";
     private final String dictionaryCollection = "dictionary2";
-    private final String testObjectCollection = "text_object_test2";
-    private final String testTypeObjectCollection = "text_object_test_type2";
+    private final String testObjectCollection = "text_object_test3";
+    private final String testTypeObjectCollection = "text_object_test_type3";
+    private final String textCollection = "texts";
+    private String testTexts = "text_test";
     private DB database;
 
     // static method to create instance of Singleton class
@@ -45,15 +47,15 @@ public class MongoDbController {
     }
 
     public List<Text> getTextsByType(TextTypeEnum type) {
-        return this.getTexts(type, "text");
+        return this.getTexts(type, textCollection);
     }
 
     public List<Text> getTextsAll() {
-        return this.getTexts(null, "text");
+        return this.getTexts(null, textCollection);
     }
 
     public List<Text> getTestTexts(TextTypeEnum type) {
-        return this.getTexts(type, "text_test");
+        return this.getTexts(type, testTexts);
     }
 
     public List<Text> getTestTexts(TextTypeEnum type, List<String> aList) {
@@ -112,7 +114,7 @@ public class MongoDbController {
     }
 
     public void addText(Text text) {
-        addTextByCollection(text, "text");
+        addTextByCollection(text, textCollection);
     }
 
     public void addTextByCollection(Text text, String collect) {
@@ -198,25 +200,26 @@ public class MongoDbController {
         return json;
     }
 
-    public Set<String> getDictionaryWord() {
-        DBCollection collection = database.getCollection(dictionaryCollection);
+    public List<String> getDictionaryWord() {
+        DBCollection collection = database.getCollection(dictionaryWordsCollection);
         DBCursor arrObject = collection.find();
-        List<String> res = new ArrayList<>();
+//        List<String> res = new ArrayList<>();
 
-        while (arrObject.hasNext()) {
-            DBObject item = arrObject.next();
-            String word = (String) item.get("_id");
-            res.add(word);
-        }
-
-        return new HashSet<String>(res);
+//        while (arrObject.hasNext()) {
+//            DBObject item = arrObject.next();
+//            String word = (String) item.get("_id");
+//            res.add(word);
+//        }
+        DBObject item = arrObject.next();
+        List res = (List) item.get("words");
+        return res;
     }
 
     public Dictionary getDictionary() {
         DBCollection collection = database.getCollection(dictionaryCollection);
         DBCursor wordItem = collection.find();
         List<String> res = null;
-        Set<String> dictionaryWord = this.getDictionaryWord();
+        Set<String> dictionaryWord = new HashSet<>(this.getDictionaryWord());
         Map<String, Map<String, Integer>> perExOccur = new HashMap<>();
         Map<String, Map<String, Integer>> promoOccur = new HashMap<>();
 

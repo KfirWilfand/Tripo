@@ -14,7 +14,7 @@
                 <Font size="35.0" />
             </font>
         </Text>
-      <Button fx:id="btnDone" layoutX="601.0" layoutY="765.0" mnemonicParsing="false" onAction="#onBtnDone" prefHeight="44.0" prefWidth="216.0" text="Done" textFill="#149050">
+      <Button fx:id="btnDone" layoutX="601.0" layoutY="730.0" mnemonicParsing="false" onAction="#onBtnDone" prefHeight="44.0" prefWidth="216.0" text="Done" textFill="#149050">
          <font>
             <Font name="System Bold" size="22.0" />
          </font>
