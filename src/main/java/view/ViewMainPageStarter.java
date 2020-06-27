@@ -25,7 +25,6 @@ public class ViewMainPageStarter extends Application {
             primaryStage.setScene(new Scene(root, 830, 880));
             primaryStage.show();
             this.primaryStage = primaryStage;
-//            new MongoDbController().connect();
         } catch (IOException e) {
             e.printStackTrace();
         }
